@@ -6,6 +6,8 @@ using Listify.Application.Exceptions;
 using Listify.Application.Exceptions.AuthExceptions;
 using Listify.Application.Interfaces;
 using Listify.Domain;
+using Listify.Domain.Entities.Token;
+using Listify.Domain.Entities.User;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 

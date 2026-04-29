@@ -1,4 +1,6 @@
-﻿namespace Listify.Domain;
+﻿using Listify.Domain.Entities.Category;
+
+namespace Listify.Domain.Entities.Listing;
 
 public class ListingAttributeValue
 {

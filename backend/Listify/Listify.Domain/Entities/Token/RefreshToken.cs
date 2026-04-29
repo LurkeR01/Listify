@@ -1,4 +1,4 @@
-﻿namespace Listify.Domain;
+﻿namespace Listify.Domain.Entities.Token;
 
 public class RefreshToken
 {
@@ -8,6 +8,6 @@ public class RefreshToken
     public DateTime Created { get; set; }
     public DateTime? Revoked { get; set; }
 
-    public User User { get; set; } = null!;
+    public User.User User { get; set; } = null!;
     public Guid UserId { get; set; }
 }

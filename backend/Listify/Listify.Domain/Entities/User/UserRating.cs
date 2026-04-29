@@ -1,4 +1,4 @@
-﻿namespace Listify.Domain;
+﻿namespace Listify.Domain.Entities.User;
 
 public class UserRating
 {
@@ -10,7 +10,7 @@ public class UserRating
     public Guid ToUserId { get; private set; }
     public User ToUser { get; private set; }
     public Guid? ListingId { get; private set; }
-    public Listing? Listing { get; private set; }
+    public Listing.Listing? Listing { get; private set; }
     public int Rating { get; private set; }
     public DateTime CreatedAt { get; private set; }
 

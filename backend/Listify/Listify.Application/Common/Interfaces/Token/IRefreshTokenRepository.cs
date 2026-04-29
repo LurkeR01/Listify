@@ -1,4 +1,5 @@
 ﻿using Listify.Domain;
+using Listify.Domain.Entities.Token;
 
 namespace Listify.Application.Interfaces;
 

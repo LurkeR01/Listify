@@ -1,4 +1,5 @@
 ﻿using Listify.Domain;
+using Listify.Domain.Entities.Token;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,8 +1,7 @@
 ﻿using Listify.Domain.DTOs;
 using Listify.Domain.Enums;
 
-
-namespace Listify.Domain;
+namespace Listify.Domain.Entities.Listing;
 
 public class Listing
 {
@@ -18,13 +17,13 @@ public class Listing
     public Location Location { get; private set; }
     
     public Guid PublishedByUserId { get; private set; }
-    public User PublishedByUser { get; private set; }
+    public User.User PublishedByUser { get; private set; }
     
     public DateTime CreatedOn { get; private set; }
     public ListingStatus Status { get; set; }
     
     public int CategoryId { get; private set; }
-    public Category Category { get; private set; }
+    public Category.Category Category { get; private set; }
     
     public IReadOnlyCollection<ListingAttributeValue> ListingAttributeValues => _listingAttributeValues;
     public IReadOnlyCollection<ListingImage> ListingImages => _listingImages;

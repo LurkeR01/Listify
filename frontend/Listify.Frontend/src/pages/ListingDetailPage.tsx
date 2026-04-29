@@ -143,7 +143,7 @@ export function ListingDetailPage() {
               <ListingDetailsCard listing={listing} />
             </Stack>
 
-            <ListingSellerCard seller={listing.publishedByUser} />
+            <ListingSellerCard seller={listing.publishedByUser} listingId={listing.id} />
           </Grid>
         </Stack>
       </Container>

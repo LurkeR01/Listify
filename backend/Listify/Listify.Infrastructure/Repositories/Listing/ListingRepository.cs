@@ -15,13 +15,13 @@ public class ListingRepository : IListingRepository
         _dbContext = dbContext;
     }
     
-    public async Task CreateListingAsync(Domain.Listing newListing)
+    public async Task CreateListingAsync(Domain.Entities.Listing.Listing newListing)
     {
         _dbContext.Listings.Add(newListing);
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<Domain.Listing> GetListingAsync(Guid listingId, CancellationToken token)
+    public async Task<Domain.Entities.Listing.Listing> GetListingAsync(Guid listingId, CancellationToken token)
     {
         var listing = await _dbContext.Listings
             .Include(l => l.PublishedByUser)
@@ -35,7 +35,7 @@ public class ListingRepository : IListingRepository
         return listing;
     }
 
-    public async Task<Domain.Listing> GetListingAsNoTrackingAsync(Guid listingId, CancellationToken token) 
+    public async Task<Domain.Entities.Listing.Listing> GetListingAsNoTrackingAsync(Guid listingId, CancellationToken token) 
         => await _dbContext.Listings
             .AsNoTracking()
             .FirstOrDefaultAsync(l => l.Id == listingId, token);

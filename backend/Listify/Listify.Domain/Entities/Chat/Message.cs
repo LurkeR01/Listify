@@ -10,7 +10,7 @@ public class Message
     public Conversation Conversation { get; private set; }
 
     public Guid SenderId { get; private set; }
-    public User Sender { get; private set; }
+    public User.User Sender { get; private set; }
 
     public string Text { get; private set; }
 

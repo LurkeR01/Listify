@@ -13,6 +13,9 @@ using Listify.Infrastructure.Repositories.Listing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using DotNetEnv;
+using Listify.Api.Hubs;
+using Listify.Application.Common.Interfaces.Chat;
+using Listify.Infrastructure.Repositories.Chat;
 
 Env.Load();
 
@@ -21,10 +24,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
 
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
+
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IAppDbContext, AppDbContext>();
 
 builder.Services.AddScoped<AuthService>(); 
@@ -33,6 +42,7 @@ builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CloudinaryService>();
 builder.Services.AddScoped<LocationService>();
+builder.Services.AddScoped<ChatService>();
 builder.Services.AddHttpClient("NovaPoshta", client =>
 {
     client.BaseAddress = new Uri("https://api.novaposhta.ua/");
@@ -57,6 +67,20 @@ builder.Services
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(key),
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chat"))
+                    context.Token = accessToken;
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddCors(options =>
@@ -75,12 +99,13 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-app.MapControllers();
 app.UseHttpsRedirection();
 app.UseCors("Frontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+app.MapControllers();
+app.MapHub<ChatHub>("/chat");
 
 app.Run();

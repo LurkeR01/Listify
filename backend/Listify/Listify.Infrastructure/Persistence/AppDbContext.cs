@@ -1,6 +1,10 @@
 ﻿using Listify.Application.Common.Interfaces;
 using Listify.Domain;
+using Listify.Domain.Entities.Category;
 using Listify.Domain.Entities.Chat;
+using Listify.Domain.Entities.Listing;
+using Listify.Domain.Entities.Token;
+using Listify.Domain.Entities.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Listify.Infrastructure.Persistence;

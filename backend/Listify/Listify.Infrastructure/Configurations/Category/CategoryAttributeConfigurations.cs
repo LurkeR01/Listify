@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Listify.Domain;
+using Listify.Domain.Entities.Category;
 
 namespace Listify.Infrastructure.Configurations.Category;
 

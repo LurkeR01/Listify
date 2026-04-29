@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Listify.Infrastructure.Configurations.Listing;
 
-public class ListingConfigurations : IEntityTypeConfiguration<Domain.Listing>
+public class ListingConfigurations : IEntityTypeConfiguration<Domain.Entities.Listing.Listing>
 {
-    public void Configure(EntityTypeBuilder<Domain.Listing> builder)
+    public void Configure(EntityTypeBuilder<Domain.Entities.Listing.Listing> builder)
     {
         builder.HasKey(l => l.Id);
 

@@ -1,5 +1,6 @@
 ﻿using Listify.Application.DTOs.User;
 using Listify.Domain;
+using Listify.Domain.Entities.User;
 
 namespace Listify.Application.Interfaces;
 

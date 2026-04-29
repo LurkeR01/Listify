@@ -1,6 +1,7 @@
 ﻿using Listify.Domain;
 using Listify.Application.Common.Interfaces.Category;
 using Listify.Application.DTOs;
+using Listify.Domain.Entities.Category;
 using Listify.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,12 +16,12 @@ public class CategoryRepository : ICategoryRepository
         _dbContext = dbContext;
     }
 
-    public Task<List<Domain.Category>> GetAllCategoriesAsync()
+    public Task<List<Domain.Entities.Category.Category>> GetAllCategoriesAsync()
     {
         return _dbContext.Categories.ToListAsync();
     }
     
-    public async Task<Domain.Category> GetByIdAsync(int id) => await _dbContext.Categories.FindAsync(id);
+    public async Task<Domain.Entities.Category.Category> GetByIdAsync(int id) => await _dbContext.Categories.FindAsync(id);
     
     public async Task<int> CountValidAttributesAsync(CreateListingCommand command)
     {

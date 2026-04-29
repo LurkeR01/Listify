@@ -1,6 +1,7 @@
 ﻿using Listify.Application.DTOs.User;
 using Listify.Application.Interfaces;
 using Listify.Domain;
+using Listify.Domain.Entities.User;
 using Listify.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

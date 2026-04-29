@@ -9,15 +9,15 @@ public class Conversation
 
     public Guid Id { get; private set; } = Guid.NewGuid();
 
-    public Guid? ListingId { get; private set; }
-    public Listing? Listing { get; private set; }
+    public Guid ListingId { get; private set; }
+    public Listing.Listing Listing { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
 
     public IReadOnlyCollection<ConversationParticipant> Participants => _participants;
     public IReadOnlyCollection<Message> Messages => _messages;
 
-    public static Conversation Create(Guid? listingId)
+    public static Conversation Create(Guid listingId)
     {
         return new Conversation
         {

@@ -5,6 +5,8 @@ using Listify.Application.Exceptions;
 using Listify.Application.Interfaces.Listing;
 using Listify.Domain;
 using Listify.Domain.DTOs;
+using Listify.Domain.Entities;
+using Listify.Domain.Entities.Listing;
 using Listify.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 

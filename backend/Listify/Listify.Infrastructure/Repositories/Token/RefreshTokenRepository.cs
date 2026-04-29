@@ -1,5 +1,6 @@
 ﻿using Listify.Application.Interfaces;
 using Listify.Domain;
+using Listify.Domain.Entities.Token;
 using Listify.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

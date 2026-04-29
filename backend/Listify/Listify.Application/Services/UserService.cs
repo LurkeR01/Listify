@@ -2,6 +2,7 @@
 using Listify.Application.Exceptions;
 using Listify.Application.Interfaces;
 using Listify.Domain;
+using Listify.Domain.Entities.User;
 
 namespace Listify.Application.Services;
 

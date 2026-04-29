@@ -1,4 +1,5 @@
 ﻿using Listify.Domain;
+using Listify.Domain.Entities.Listing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Listify.Application.Common.Interfaces;

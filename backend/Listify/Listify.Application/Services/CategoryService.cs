@@ -1,5 +1,6 @@
 ﻿using Listify.Application.Common.Interfaces.Category;
 using Listify.Domain;
+using Listify.Domain.Entities.Category;
 
 namespace Listify.Application.Services;
 

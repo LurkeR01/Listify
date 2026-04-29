@@ -1,4 +1,6 @@
-﻿namespace Listify.Domain;
+﻿using Listify.Domain.Entities.Token;
+
+namespace Listify.Domain.Entities.User;
 
 public class User
 {

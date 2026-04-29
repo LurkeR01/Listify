@@ -1,6 +1,4 @@
-﻿using Listify.Domain.Enums;
-
-namespace Listify.Domain;
+﻿namespace Listify.Domain.Entities.Category;
 
 public class CategoryAttribute
 {

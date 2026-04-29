@@ -2,6 +2,7 @@
 using Listify.Api.DTOs.Listing;
 using Listify.Api.DTOs.User;
 using Listify.Domain;
+using Listify.Domain.Entities.Listing;
 
 namespace Listify.Api.Mappers;
 

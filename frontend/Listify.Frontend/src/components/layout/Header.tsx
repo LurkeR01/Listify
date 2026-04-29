@@ -1,4 +1,4 @@
-import { Box, Button, Container, Flex, Heading, HStack, Icon, IconButton } from "@chakra-ui/react"
+import { Avatar, Box, Button, Container, Flex, Heading, HStack, Icon, IconButton } from "@chakra-ui/react"
 import { FiPlusCircle, FiUser } from "react-icons/fi"
 import { SearchBar } from "@/components/common/SearchBar"
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom"
@@ -16,6 +16,7 @@ export function Header() {
   const [isProfileBannerOpen, setIsProfileBannerOpen] = useState(false)
   const profileButtonGroupRef = useRef<HTMLDivElement | null>(null)
   const { isAuthenticated, user, setAccessToken } = useAuth()
+  const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(" ").trim() || user?.username || "Користувач"
 
   useEffect(() => {
     if (!isProfileBannerOpen) return
@@ -111,6 +112,8 @@ export function Header() {
                 colorPalette="blue"
                 variant="outline"
                 rounded="full"
+                p="0"
+                overflow="hidden"
                 onClick={() => {
                   if (!isAuthenticated) {
                     navigate("/auth")
@@ -119,7 +122,14 @@ export function Header() {
 
                   setIsProfileBannerOpen((prev) => !prev)
                 }}>
-                <FiUser />
+                {isAuthenticated && user?.avatarUrl ? (
+                  <Avatar.Root size="sm" bg="transparent">
+                    <Avatar.Image src={user.avatarUrl} alt={displayName} />
+                    <Avatar.Fallback name={displayName} />
+                  </Avatar.Root>
+                ) : (
+                  <FiUser />
+                )}
               </IconButton>
 
               {isAuthenticated && isProfileBannerOpen ? (

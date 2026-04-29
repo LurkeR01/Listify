@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Listify.Infrastructure.Configurations.Category;
 
-public class CategoryConfigurations : IEntityTypeConfiguration<Domain.Category>
+public class CategoryConfigurations : IEntityTypeConfiguration<Domain.Entities.Category.Category>
 {
-    public void Configure(EntityTypeBuilder<Domain.Category> builder)
+    public void Configure(EntityTypeBuilder<Domain.Entities.Category.Category> builder)
     {
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Name).IsRequired();

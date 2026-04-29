@@ -1,4 +1,4 @@
-﻿namespace Listify.Domain;
+﻿namespace Listify.Domain.Entities.Listing;
 
 public class ListingImage
 {
