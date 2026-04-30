@@ -2,6 +2,7 @@ import { Avatar, Box, Button, Heading, HStack, Icon, List, Separator, Stack, Tex
 import { LuMail, LuMessageCircle, LuPhone, LuStar } from "react-icons/lu"
 import type { ResponseUserDto } from "@/DTOs/User/UserDto"
 import { useListingChatOverlay } from "@/hooks/useListingChatOverlay"
+import { useAuth } from "@/auth/AuthContext"
 
 type ListingSellerCardProps = {
   seller: ResponseUserDto
@@ -11,6 +12,7 @@ type ListingSellerCardProps = {
 export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps) {
   const displayName = [seller.firstName, seller.lastName].filter(Boolean).join(" ").trim() || seller.username || "Користувач"
   const { openChat, overlay } = useListingChatOverlay()
+  const { user } = useAuth()
 
   return (
     <>
@@ -34,23 +36,22 @@ export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps)
               <Icon as={LuStar} boxSize="4" color="yellow.400" />
               {/* <Text fontSize="sm">{seller.rating.toFixed(1)}</Text> */}
             </HStack>
-            {/* {seller.verified && (
-              <HStack gap="1" color="green.600">
-                <Icon as={LuShieldCheck} boxSize="4" />
-                <Text fontSize="sm">Перевірений продавець</Text>
-              </HStack>
-            )} */}
           </Stack>
 
           <Separator />
 
           <Stack gap="3">
-            <Button colorPalette="blue" size="lg" gap="2">
+            <Button
+             colorPalette="blue"
+              size="lg" 
+              gap="2"
+              disabled={!user || user.id === seller.id}>
               <Icon as={LuPhone} boxSize="4" />
               Показати телефон
             </Button>
             <Button
               variant="outline"
+              disabled={!user || user.id === seller.id}
               colorPalette="blue"
               size="lg"
               gap="2"
@@ -59,7 +60,12 @@ export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps)
               <Icon as={LuMessageCircle} boxSize="4" />
               Написати
             </Button>
-            <Button variant="outline" colorPalette="blue" size="lg" gap="2">
+            <Button 
+              variant="outline" 
+              disabled={!user || user.id === seller.id}
+              colorPalette="blue" 
+              size="lg" 
+              gap="2">
               <Icon as={LuMail} boxSize="4" />
               Email продавцю
             </Button>

@@ -1,16 +1,19 @@
-import { Avatar, Box, Button, HStack, Heading, Icon, IconButton, Image, Input, Spinner, Stack, Text } from "@chakra-ui/react"
+import { Box, Button, HStack, Heading, Icon, IconButton, Image, Input, Spinner, Stack, Text } from "@chakra-ui/react"
 import { LuImagePlus, LuSend, LuX } from "react-icons/lu"
 import { useEffect, useMemo, useRef, useState } from "react"
 import type { ConversationDto } from "@/DTOs/Chat/ConversationDto"
+import type { MessageDto } from "@/DTOs/Chat/MessageDto"
+import { ChatMessageList } from "@/components/chat/ChatMessageList"
 
 type ListingChatOverlayProps = {
   isOpen: boolean
   isLoading: boolean
   error: string | null
   conversation: ConversationDto | null
+  messages: MessageDto[]
   currentUserId?: string
   onClose: () => void
-  onSendMessage: (payload: { text: string; image?: File | null }) => void
+  onSendMessage: (payload: { text: string; image?: File | null }) => void | Promise<void>
 }
 
 export function ListingChatOverlay({
@@ -18,12 +21,11 @@ export function ListingChatOverlay({
   isLoading,
   error,
   conversation,
+  messages,
   currentUserId,
   onClose,
   onSendMessage,
 }: ListingChatOverlayProps) {
-  if (!isOpen) return null
-
   const listingTitle = conversation?.listingPreview.title ?? "Чат"
   const listingPrice = conversation ? `${new Intl.NumberFormat("uk-UA").format(conversation.listingPreview.price)} грн` : ""
   const listingLocation = conversation?.listingPreview.location?.name ?? ""
@@ -53,9 +55,11 @@ export function ListingChatOverlay({
 
   const handleSend = () => {
     if (!canSend) return
-    onSendMessage({ text: draftText, image: draftImage })
+    void onSendMessage({ text: draftText, image: draftImage })
     clearDraft()
   }
+
+  if (!isOpen) return null
 
   return (
     <Box
@@ -124,58 +128,13 @@ export function ListingChatOverlay({
           )}
 
           {!isLoading && !error && conversation && (
-            <Stack gap="3">
-              {conversation.lastMessages.length === 0 ? (
-                <Text color="gray.600" fontSize="sm" textAlign="center" py="6">
-                  Повідомлень ще немає. Напишіть продавцю в чаті.
-                </Text>
-              ) : (
-                conversation.lastMessages.map((m) => {
-                  const isMine = currentUserId && m.sender.id === currentUserId
-                  const senderName = (m.sender.firstName || "Користувач").trim()
-                  const timeLabel = m.createdAt
-                    ? new Date(m.createdAt).toLocaleString("uk-UA", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
-                    : ""
-                  return (
-                    <Box key={m.id} alignSelf={isMine ? "flex-end" : "flex-start"} maxW="85%">
-                      <HStack gap="2" mb="1" justify={isMine ? "flex-end" : "flex-start"}>
-                        {!isMine && (
-                          <Avatar.Root size="xs" bg="blue.100" color="blue.700">
-                            {m.sender.avatarUrl ? (
-                              <Avatar.Image src={m.sender.avatarUrl} alt={senderName} />
-                            ) : (
-                              <Avatar.Fallback name={senderName} />
-                            )}
-                          </Avatar.Root>
-                        )}
-                        <Text fontSize="xs" color="gray.600">
-                          {isMine ? "Ви" : senderName}
-                        </Text>
-                        {timeLabel && (
-                          <Text fontSize="xs" color="gray.500">
-                            • {timeLabel}
-                          </Text>
-                        )}
-                      </HStack>
-                      <Box
-                        bg={isMine ? "blue.600" : "gray.100"}
-                        color={isMine ? "white" : "gray.900"}
-                        px="3"
-                        py="2"
-                        rounded="xl"
-                      >
-                        {m.imageUrl && (
-                          <Image src={m.imageUrl} alt={m.imageName ?? "image"} rounded="lg" mb="2" maxH="220px" objectFit="cover" />
-                        )}
-                        <Text fontSize="sm" whiteSpace="pre-wrap">
-                          {m.text}
-                        </Text>
-                      </Box>
-                    </Box>
-                  )
-                })
-              )}
-            </Stack>
+            messages.length === 0 ? (
+              <Text color="gray.600" fontSize="sm" textAlign="center" py="6">
+                Повідомлень ще немає. Напишіть продавцю в чаті.
+              </Text>
+            ) : (
+              <ChatMessageList messages={messages} currentUserId={currentUserId} />
+            )
           )}
         </Box>
 

@@ -41,6 +41,8 @@ type ResponseMessageApiDto = {
   Text?: string
   sender?: ResponseShortUserApiDto
   Sender?: ResponseShortUserApiDto
+  senderId?: string
+  SenderId?: string
   createdAt?: string
   CreatedAt?: string
 }
@@ -83,18 +85,6 @@ const toListingPreview = (value: ResponseListingPreviewApiDto | null | undefined
   }
 }
 
-const toMessage = (value: ResponseMessageApiDto | null | undefined): MessageDto => {
-  const sender = value?.sender ?? value?.Sender
-  return {
-    id: String(value?.id ?? value?.Id ?? ""),
-    text: String(value?.text ?? value?.Text ?? ""),
-    sender: toShortUser(sender),
-    createdAt: String(value?.createdAt ?? value?.CreatedAt ?? ""),
-    imageUrl: undefined,
-    imageName: undefined,
-  }
-}
-
 export const connectConversation = async (dto: RequestConnectionDto): Promise<ConversationDto> => {
   const response = await api.post<ResponseConversationApiDto>("/chat/connect", {
     listingId: dto.listingId,
@@ -103,10 +93,36 @@ export const connectConversation = async (dto: RequestConnectionDto): Promise<Co
 
   const source = response.data
 
+  const participants = (source.participants ?? source.Participants ?? []).map(toShortUser)
+  const participantsById = new Map(participants.map((p) => [p.id.trim().toLowerCase(), p]))
+
+  const toMessageWithParticipants = (value: ResponseMessageApiDto | null | undefined): MessageDto => {
+    const sender = value?.sender ?? value?.Sender
+    const senderId = String(value?.senderId ?? value?.SenderId ?? sender?.id ?? sender?.Id ?? "").trim()
+    const normalizedSenderId = senderId.toLowerCase()
+
+    const explicitSender = toShortUser(sender)
+    const hasExplicitSenderInfo = Boolean(explicitSender.id || explicitSender.firstName || explicitSender.avatarUrl || explicitSender.avatarPublicId)
+
+    const resolvedSender =
+      participantsById.get(normalizedSenderId) ??
+      (hasExplicitSenderInfo ? explicitSender : undefined) ??
+      { id: senderId, firstName: "Користувач" }
+
+    return {
+      id: String(value?.id ?? value?.Id ?? ""),
+      text: String(value?.text ?? value?.Text ?? ""),
+      sender: resolvedSender,
+      createdAt: String(value?.createdAt ?? value?.CreatedAt ?? ""),
+      imageUrl: undefined,
+      imageName: undefined,
+    }
+  }
+
   return {
     id: String(source.id ?? source.Id ?? ""),
     listingPreview: toListingPreview(source.listingPreview ?? source.ListingPreview),
-    participants: (source.participants ?? source.Participants ?? []).map(toShortUser),
-    lastMessages: (source.lastMessages ?? source.LastMessages ?? []).map(toMessage),
+    participants,
+    lastMessages: (source.lastMessages ?? source.LastMessages ?? []).map(toMessageWithParticipants),
   }
 }
