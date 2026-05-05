@@ -26,6 +26,10 @@ type HubReceiveMessageDto = {
   CreatedAt?: string
 }
 
+type SendMessagePayload = {
+  text: string
+}
+
 const getHubUrl = (): string => {
   const base = String(api.defaults.baseURL ?? "").trim()
   if (!base) return "/chat"
@@ -78,16 +82,18 @@ export function useListingChatOverlay(): UseListingChatOverlayResult {
   }, [stopConnection])
 
   const sendMessage = useCallback(
-    async (payload: { text: string; image?: File | null }) => {
+    async (payload: SendMessagePayload) => {
       const text = payload.text ?? ""
-      if (!text.trim()) return
-      if (!connectionRef.current || !conversation) return
+      if (!text.trim()) return false
+      if (!connectionRef.current || !conversation) return false
 
       try {
         await connectionRef.current.invoke("SendMessage", conversation.id, text.trim())
+        return true
       } catch (e) {
         const message = e instanceof Error ? e.message : "Не вдалося надіслати повідомлення"
         setError(message)
+        return false
       }
     },
     [conversation],
@@ -103,6 +109,7 @@ export function useListingChatOverlay(): UseListingChatOverlayResult {
       setIsOpen(true)
       setIsLoading(true)
       setError(null)
+      await stopConnection()
 
       try {
         const conv = await connectConversation(dto)
@@ -166,11 +173,12 @@ export function useListingChatOverlay(): UseListingChatOverlayResult {
       } catch (e) {
         const message = e instanceof Error ? e.message : "Не вдалося відкрити чат"
         setError(message)
+        void stopConnection()
       } finally {
         setIsLoading(false)
       }
     },
-    [accessToken, isAuthenticated, navigate, user?.avatarPublicId, user?.avatarUrl, user?.firstName, user?.id],
+    [accessToken, isAuthenticated, navigate, stopConnection, user?.avatarPublicId, user?.avatarUrl, user?.firstName, user?.id],
   )
 
   useEffect(() => {

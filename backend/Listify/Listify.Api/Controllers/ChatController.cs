@@ -26,7 +26,6 @@ namespace Listify.Api.Controllers
             var conversation = await _chatService.GetOrCreateConversation(
                 dto.ListingId,
                 buyerId,
-                dto.SellerId,
                 token
             );
 

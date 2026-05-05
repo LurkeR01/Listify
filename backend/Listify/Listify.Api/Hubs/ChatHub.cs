@@ -49,4 +49,26 @@ public class ChatHub : Hub
             throw new HubException(ex.Message);
         }
     }
+    
+    public async Task SendMessage(string conversationId, string text)
+    {
+        var userId = Context.UserIdentifier;
+        if (userId == null)
+            throw new HubException("Unauthorized");
+
+        var message = await _chatService.SendMessageAsync(
+            Guid.Parse(conversationId),
+            Guid.Parse(userId),
+            text,
+            Context.ConnectionAborted
+        );
+
+        await Clients.Group(conversationId).SendAsync("ReceiveMessage", new
+        {
+            id = message.Id,
+            text = message.Text,
+            senderId = message.SenderId,
+            createdAt = message.CreatedAt
+        });
+    }
 }

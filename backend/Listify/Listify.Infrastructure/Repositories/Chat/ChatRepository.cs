@@ -46,9 +46,11 @@ public class ChatRepository : IChatRepository
 
     public async Task<Conversation> CreateAsync(Conversation conversation, CancellationToken token)
     {
-        _dbContext.Conversations.Add(conversation);
+        await _dbContext.Conversations.AddAsync(conversation, token);
         await _dbContext.SaveChangesAsync(token);
 
         return await GetByIdAsync(conversation.Id, token);
     }
+
+    public async Task SaveChangesAsync(CancellationToken token) => await _dbContext.SaveChangesAsync(token);
 }

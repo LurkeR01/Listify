@@ -52,6 +52,10 @@ type ResponseConversationApiDto = {
   Id?: string
   listingPreview?: ResponseListingPreviewApiDto
   ListingPreview?: ResponseListingPreviewApiDto
+  buyer?: ResponseShortUserApiDto
+  Buyer?: ResponseShortUserApiDto
+  seller?: ResponseShortUserApiDto
+  Seller?: ResponseShortUserApiDto
   participants?: ResponseShortUserApiDto[]
   Participants?: ResponseShortUserApiDto[]
   lastMessages?: ResponseMessageApiDto[]
@@ -93,7 +97,14 @@ export const connectConversation = async (dto: RequestConnectionDto): Promise<Co
 
   const source = response.data
 
-  const participants = (source.participants ?? source.Participants ?? []).map(toShortUser)
+  const responseParticipants = (source.participants ?? source.Participants ?? []).map(toShortUser)
+  const buyer = toShortUser(source.buyer ?? source.Buyer)
+  const seller = toShortUser(source.seller ?? source.Seller)
+  const participants = [buyer, seller, ...responseParticipants].filter(
+    (participant, index, all) =>
+      participant.id.trim() &&
+      all.findIndex((candidate) => candidate.id.trim().toLowerCase() === participant.id.trim().toLowerCase()) === index,
+  )
   const participantsById = new Map(participants.map((p) => [p.id.trim().toLowerCase(), p]))
 
   const toMessageWithParticipants = (value: ResponseMessageApiDto | null | undefined): MessageDto => {

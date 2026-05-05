@@ -1,6 +1,6 @@
 import { Box, Button, HStack, Heading, Icon, IconButton, Image, Input, Spinner, Stack, Text } from "@chakra-ui/react"
-import { LuImagePlus, LuSend, LuX } from "react-icons/lu"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { LuSend, LuX } from "react-icons/lu"
+import { useState } from "react"
 import type { ConversationDto } from "@/DTOs/Chat/ConversationDto"
 import type { MessageDto } from "@/DTOs/Chat/MessageDto"
 import { ChatMessageList } from "@/components/chat/ChatMessageList"
@@ -13,7 +13,7 @@ type ListingChatOverlayProps = {
   messages: MessageDto[]
   currentUserId?: string
   onClose: () => void
-  onSendMessage: (payload: { text: string; image?: File | null }) => void | Promise<void>
+  onSendMessage: (payload: { text: string }) => boolean | Promise<boolean>
 }
 
 export function ListingChatOverlay({
@@ -31,32 +31,19 @@ export function ListingChatOverlay({
   const listingLocation = conversation?.listingPreview.location?.name ?? ""
 
   const [draftText, setDraftText] = useState("")
-  const [draftImage, setDraftImage] = useState<File | null>(null)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [isSending, setIsSending] = useState(false)
 
-  const draftImagePreviewUrl = useMemo(() => {
-    if (!draftImage) return null
-    return URL.createObjectURL(draftImage)
-  }, [draftImage])
+  const canSend = draftText.trim().length > 0 && !isSending
 
-  useEffect(() => {
-    return () => {
-      if (draftImagePreviewUrl) URL.revokeObjectURL(draftImagePreviewUrl)
-    }
-  }, [draftImagePreviewUrl])
-
-  const canSend = draftText.trim().length > 0 || !!draftImage
-
-  const clearDraft = () => {
-    setDraftText("")
-    setDraftImage(null)
-    if (fileInputRef.current) fileInputRef.current.value = ""
-  }
-
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!canSend) return
-    void onSendMessage({ text: draftText, image: draftImage })
-    clearDraft()
+    setIsSending(true)
+    try {
+      const sent = await onSendMessage({ text: draftText })
+      if (sent) setDraftText("")
+    } finally {
+      setIsSending(false)
+    }
   }
 
   if (!isOpen) return null
@@ -127,76 +114,43 @@ export function ListingChatOverlay({
             </Stack>
           )}
 
-          {!isLoading && !error && conversation && (
-            messages.length === 0 ? (
+          {!isLoading &&
+            !error &&
+            conversation &&
+            (messages.length === 0 ? (
               <Text color="gray.600" fontSize="sm" textAlign="center" py="6">
                 Повідомлень ще немає. Напишіть продавцю в чаті.
               </Text>
             ) : (
               <ChatMessageList messages={messages} currentUserId={currentUserId} />
-            )
-          )}
+            ))}
         </Box>
 
         <Box borderTopWidth="1px" borderColor="blue.100" bg="white" px="4" py="3">
-          <Stack gap="2">
-            {draftImagePreviewUrl && (
-              <HStack gap="3" align="start">
-                <Image src={draftImagePreviewUrl} alt={draftImage?.name ?? "draft"} w="72px" h="72px" objectFit="cover" rounded="lg" />
-                <Stack gap="1" flex="1">
-                  <Text fontSize="sm" fontWeight="medium" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
-                    {draftImage?.name ?? "image"}
-                  </Text>
-                  <Button size="xs" variant="outline" colorPalette="blue" alignSelf="start" onClick={() => setDraftImage(null)}>
-                    Прибрати
-                  </Button>
-                </Stack>
-              </HStack>
-            )}
+          <HStack gap="2">
+            <Input
+              placeholder="Повідомлення..."
+              value={draftText}
+              disabled={isSending}
+              onChange={(e) => setDraftText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault()
+                  void handleSend()
+                }
+              }}
+            />
 
-            <HStack gap="2">
-              <IconButton
-                aria-label="Додати зображення"
-                variant="outline"
-                colorPalette="blue"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Icon as={LuImagePlus} boxSize="5" />
-              </IconButton>
-
-              <Input
-                placeholder="Повідомлення…"
-                value={draftText}
-                onChange={(e) => setDraftText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault()
-                    handleSend()
-                  }
-                }}
-              />
-
-              <IconButton
-                aria-label="Надіслати"
-                colorPalette="blue"
-                onClick={handleSend}
-                disabled={!canSend}
-              >
-                <Icon as={LuSend} boxSize="5" />
-              </IconButton>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                onChange={(e) => {
-                  const file = e.target.files?.[0] ?? null
-                  setDraftImage(file)
-                }}
-              />
-            </HStack>
-          </Stack>
+            <IconButton
+              aria-label="Надіслати"
+              colorPalette="blue"
+              onClick={() => void handleSend()}
+              disabled={!canSend}
+              loading={isSending}
+            >
+              <Icon as={LuSend} boxSize="5" />
+            </IconButton>
+          </HStack>
         </Box>
       </Stack>
     </Box>

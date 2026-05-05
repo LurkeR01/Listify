@@ -4,7 +4,7 @@ public class Message
 {
     private Message() {}
 
-    public Guid Id { get; private set; } = Guid.NewGuid();
+    public Guid Id { get; private set; }
 
     public Guid ConversationId { get; private set; }
     public Conversation Conversation { get; private set; }

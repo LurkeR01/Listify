@@ -35,11 +35,11 @@ public class Conversation
         };
     }
 
-    public void AddMessage(Guid senderId, string text)
+    public void AddMessage(Message message)
     {
-        if (senderId != BuyerId && senderId != SellerId)
+        if (message.SenderId != BuyerId && message.SenderId != SellerId)
             throw new Exception("User is not part of conversation");
 
-        _messages.Add(Message.Create(Id, senderId, text));
+        _messages.Add(message);
     }
 }
