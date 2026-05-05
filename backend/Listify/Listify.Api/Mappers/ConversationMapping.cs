@@ -22,22 +22,29 @@ public static class ConversationMapping
                 Id = conversation.Listing.Id,
                 Title = conversation.Listing.Title,
                 Price = conversation.Listing.Price,
-                Location = new LocationDto
-                {
-                    Name = conversation.Listing.Location?.Name ?? string.Empty,
-                    Area = conversation.Listing.Location?.Area ?? string.Empty,
-                    Ref = conversation.Listing.Location?.Ref ?? string.Empty,
-                },
-                ImageUrl = conversation.Listing.ListingImages?
-                    .FirstOrDefault(i => i.Order == 0)?.Url,
-            },
-            Participants = conversation.Participants.Select(p => new ShortResponseUserDto
+            Location = new LocationDto
             {
-                Id = p.User?.Id ?? p.UserId,
-                FirstName = p.User?.FirstName ?? string.Empty,
-                AvatarUrl = p.User?.AvatarUrl,
-                AvatarPublicId = p.User?.AvatarPublicId,
-            }).ToList(),
+                Name = conversation.Listing.Location?.Name ?? string.Empty,
+                Area = conversation.Listing.Location?.Area ?? string.Empty,
+                Ref = conversation.Listing.Location?.Ref ?? string.Empty,
+            },
+            ImageUrl = conversation.Listing.ListingImages?
+                .FirstOrDefault(i => i.Order == 0)?.Url,
+            },
+            Buyer = new ShortResponseUserDto
+            {
+                Id = conversation.Buyer?.Id ?? conversation.BuyerId,
+                FirstName = conversation.Buyer?.FirstName ?? string.Empty,
+                AvatarUrl = conversation.Buyer?.AvatarUrl,
+                AvatarPublicId = conversation.Buyer?.AvatarPublicId,
+            },
+            Seller = new ShortResponseUserDto
+            {
+                Id = conversation.Seller?.Id ?? conversation.SellerId,
+                FirstName = conversation.Seller?.FirstName ?? string.Empty,
+                AvatarUrl = conversation.Seller?.AvatarUrl,
+                AvatarPublicId = conversation.Seller?.AvatarPublicId,
+            },
             LastMessages = conversation.Messages.Select(m => new MessageDto
             {
                 Id = m.Id,

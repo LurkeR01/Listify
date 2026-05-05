@@ -28,9 +28,7 @@ public class ChatService
         if (existing != null)
             return existing;
 
-        var conversation = Conversation.Create(listingId);
-        conversation.AddParticipant(buyerId);
-        conversation.AddParticipant(sellerId);
+        var conversation = Conversation.Create(listingId, buyerId, sellerId);
 
         return await _chatRepository.CreateAsync(conversation, token);
     }
@@ -42,9 +40,6 @@ public class ChatService
         if (conversation == null)
             throw new NotFoundException("Conversation not found");
 
-        if (conversation.Participants.Any(u => u.UserId == userId))
-            return true;
-        
-        return false;
+        return conversation.BuyerId == userId || conversation.SellerId == userId;
     }
 }

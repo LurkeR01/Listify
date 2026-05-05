@@ -13,14 +13,26 @@ public class ConversationConfigurations : IEntityTypeConfiguration<Conversation>
         builder.Property(c => c.CreatedAt)
             .IsRequired();
 
+        builder.Property(c => c.BuyerId)
+            .IsRequired();
+
+        builder.Property(c => c.SellerId)
+            .IsRequired();
+
         builder.HasOne(c => c.Listing)
             .WithMany()
             .HasForeignKey(c => c.ListingId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasMany(c => c.Participants)
-            .WithOne(p => p.Conversation)
-            .HasForeignKey(p => p.ConversationId);
+        builder.HasOne(c => c.Buyer)
+            .WithMany()
+            .HasForeignKey(c => c.BuyerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(c => c.Seller)
+            .WithMany()
+            .HasForeignKey(c => c.SellerId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(c => c.Messages)
             .WithOne(m => m.Conversation)

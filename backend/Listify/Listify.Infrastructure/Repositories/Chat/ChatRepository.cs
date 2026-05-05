@@ -23,13 +23,13 @@ public class ChatRepository : IChatRepository
         return await _dbContext.Conversations
             .Include(c => c.Listing)
                 .ThenInclude(l => l.ListingImages)
-            .Include(c => c.Participants)
-                .ThenInclude(p => p.User)
+            .Include(c => c.Buyer)
+            .Include(c => c.Seller)
             .Include(c => c.Messages)
                 .ThenInclude(m => m.Sender)
             .FirstOrDefaultAsync(c => c.ListingId == listingId
-                && c.Participants.Any(p => p.UserId == buyerId)
-                && c.Participants.Any(p => p.UserId == sellerId), token);
+                && c.BuyerId == buyerId
+                && c.SellerId == sellerId, token);
     }
 
     public async Task<Conversation> GetByIdAsync(Guid conversationId, CancellationToken token)
@@ -37,8 +37,8 @@ public class ChatRepository : IChatRepository
         return await _dbContext.Conversations
             .Include(c => c.Listing)
                 .ThenInclude(l => l.ListingImages)
-            .Include(c => c.Participants)
-                .ThenInclude(p => p.User)
+            .Include(c => c.Buyer)
+            .Include(c => c.Seller)
             .Include(c => c.Messages)
                 .ThenInclude(m => m.Sender)
             .FirstOrDefaultAsync(c => c.Id == conversationId, token);

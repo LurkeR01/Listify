@@ -22,7 +22,7 @@ namespace Listify.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Listify.Domain.Category", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Category.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,7 +53,7 @@ namespace Listify.Infrastructure.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("Listify.Domain.CategoryAttribute", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Category.CategoryAttribute", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,7 +78,7 @@ namespace Listify.Infrastructure.Migrations
                     b.ToTable("CategoryAttributes");
                 });
 
-            modelBuilder.Entity("Listify.Domain.CategoryAttributeValue", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Category.CategoryAttributeValue", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -106,44 +106,27 @@ namespace Listify.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BuyerId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ListingId")
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SellerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BuyerId");
 
                     b.HasIndex("ListingId");
 
+                    b.HasIndex("SellerId");
+
                     b.ToTable("Conversations");
-                });
-
-            modelBuilder.Entity("Listify.Domain.Entities.Chat.ConversationParticipant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("ConversationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("JoinedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("ConversationId", "UserId")
-                        .IsUnique();
-
-                    b.ToTable("ConversationParticipants");
                 });
 
             modelBuilder.Entity("Listify.Domain.Entities.Chat.Message", b =>
@@ -176,7 +159,7 @@ namespace Listify.Infrastructure.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Listify.Domain.Listing", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Listing.Listing", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -214,7 +197,7 @@ namespace Listify.Infrastructure.Migrations
                     b.ToTable("Listings");
                 });
 
-            modelBuilder.Entity("Listify.Domain.ListingAttributeValue", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Listing.ListingAttributeValue", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -238,7 +221,7 @@ namespace Listify.Infrastructure.Migrations
                     b.ToTable("ListingAttributeValues");
                 });
 
-            modelBuilder.Entity("Listify.Domain.ListingImage", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Listing.ListingImage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -265,7 +248,7 @@ namespace Listify.Infrastructure.Migrations
                     b.ToTable("ListingImages");
                 });
 
-            modelBuilder.Entity("Listify.Domain.RefreshToken", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Token.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -294,7 +277,7 @@ namespace Listify.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("Listify.Domain.User", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.User.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -340,7 +323,7 @@ namespace Listify.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Listify.Domain.UserRating", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.User.UserRating", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -374,9 +357,9 @@ namespace Listify.Infrastructure.Migrations
                     b.ToTable("UserRatings");
                 });
 
-            modelBuilder.Entity("Listify.Domain.Category", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Category.Category", b =>
                 {
-                    b.HasOne("Listify.Domain.Category", "Parent")
+                    b.HasOne("Listify.Domain.Entities.Category.Category", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -384,9 +367,9 @@ namespace Listify.Infrastructure.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("Listify.Domain.CategoryAttribute", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Category.CategoryAttribute", b =>
                 {
-                    b.HasOne("Listify.Domain.Category", "Category")
+                    b.HasOne("Listify.Domain.Entities.Category.Category", "Category")
                         .WithMany("CategoryAttributes")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -395,9 +378,9 @@ namespace Listify.Infrastructure.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Listify.Domain.CategoryAttributeValue", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Category.CategoryAttributeValue", b =>
                 {
-                    b.HasOne("Listify.Domain.CategoryAttribute", "CategoryAttribute")
+                    b.HasOne("Listify.Domain.Entities.Category.CategoryAttribute", "CategoryAttribute")
                         .WithMany("CategoryAttributeValues")
                         .HasForeignKey("CategoryAttributeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -408,31 +391,29 @@ namespace Listify.Infrastructure.Migrations
 
             modelBuilder.Entity("Listify.Domain.Entities.Chat.Conversation", b =>
                 {
-                    b.HasOne("Listify.Domain.Listing", "Listing")
+                    b.HasOne("Listify.Domain.Entities.User.User", "Buyer")
                         .WithMany()
-                        .HasForeignKey("ListingId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Listing");
-                });
-
-            modelBuilder.Entity("Listify.Domain.Entities.Chat.ConversationParticipant", b =>
-                {
-                    b.HasOne("Listify.Domain.Entities.Chat.Conversation", "Conversation")
-                        .WithMany("Participants")
-                        .HasForeignKey("ConversationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Listify.Domain.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("BuyerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Conversation");
+                    b.HasOne("Listify.Domain.Entities.Listing.Listing", "Listing")
+                        .WithMany()
+                        .HasForeignKey("ListingId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("Listify.Domain.Entities.User.User", "Seller")
+                        .WithMany()
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Buyer");
+
+                    b.Navigation("Listing");
+
+                    b.Navigation("Seller");
                 });
 
             modelBuilder.Entity("Listify.Domain.Entities.Chat.Message", b =>
@@ -443,7 +424,7 @@ namespace Listify.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Listify.Domain.User", "Sender")
+                    b.HasOne("Listify.Domain.Entities.User.User", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -454,21 +435,21 @@ namespace Listify.Infrastructure.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("Listify.Domain.Listing", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Listing.Listing", b =>
                 {
-                    b.HasOne("Listify.Domain.Category", "Category")
+                    b.HasOne("Listify.Domain.Entities.Category.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Listify.Domain.User", "PublishedByUser")
+                    b.HasOne("Listify.Domain.Entities.User.User", "PublishedByUser")
                         .WithMany()
                         .HasForeignKey("PublishedByUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Listify.Domain.Location", "Location", b1 =>
+                    b.OwnsOne("Listify.Domain.Entities.Location", "Location", b1 =>
                         {
                             b1.Property<Guid>("ListingId")
                                 .HasColumnType("uniqueidentifier");
@@ -504,15 +485,15 @@ namespace Listify.Infrastructure.Migrations
                     b.Navigation("PublishedByUser");
                 });
 
-            modelBuilder.Entity("Listify.Domain.ListingAttributeValue", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Listing.ListingAttributeValue", b =>
                 {
-                    b.HasOne("Listify.Domain.CategoryAttributeValue", "CategoryAttributeValue")
+                    b.HasOne("Listify.Domain.Entities.Category.CategoryAttributeValue", "CategoryAttributeValue")
                         .WithMany()
                         .HasForeignKey("CategoryAttributeValueId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Listify.Domain.Listing", "Listing")
+                    b.HasOne("Listify.Domain.Entities.Listing.Listing", "Listing")
                         .WithMany("ListingAttributeValues")
                         .HasForeignKey("ListingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -523,9 +504,9 @@ namespace Listify.Infrastructure.Migrations
                     b.Navigation("Listing");
                 });
 
-            modelBuilder.Entity("Listify.Domain.ListingImage", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Listing.ListingImage", b =>
                 {
-                    b.HasOne("Listify.Domain.Listing", "Listing")
+                    b.HasOne("Listify.Domain.Entities.Listing.Listing", "Listing")
                         .WithMany("ListingImages")
                         .HasForeignKey("ListingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -534,9 +515,9 @@ namespace Listify.Infrastructure.Migrations
                     b.Navigation("Listing");
                 });
 
-            modelBuilder.Entity("Listify.Domain.RefreshToken", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Token.RefreshToken", b =>
                 {
-                    b.HasOne("Listify.Domain.User", "User")
+                    b.HasOne("Listify.Domain.Entities.User.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -545,9 +526,9 @@ namespace Listify.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Listify.Domain.User", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.User.User", b =>
                 {
-                    b.OwnsOne("Listify.Domain.Location", "Location", b1 =>
+                    b.OwnsOne("Listify.Domain.Entities.Location", "Location", b1 =>
                         {
                             b1.Property<Guid>("UserId")
                                 .HasColumnType("uniqueidentifier");
@@ -578,20 +559,20 @@ namespace Listify.Infrastructure.Migrations
                     b.Navigation("Location");
                 });
 
-            modelBuilder.Entity("Listify.Domain.UserRating", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.User.UserRating", b =>
                 {
-                    b.HasOne("Listify.Domain.User", "FromUser")
+                    b.HasOne("Listify.Domain.Entities.User.User", "FromUser")
                         .WithMany()
                         .HasForeignKey("FromUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Listify.Domain.Listing", "Listing")
+                    b.HasOne("Listify.Domain.Entities.Listing.Listing", "Listing")
                         .WithMany()
                         .HasForeignKey("ListingId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Listify.Domain.User", "ToUser")
+                    b.HasOne("Listify.Domain.Entities.User.User", "ToUser")
                         .WithMany()
                         .HasForeignKey("ToUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -604,14 +585,14 @@ namespace Listify.Infrastructure.Migrations
                     b.Navigation("ToUser");
                 });
 
-            modelBuilder.Entity("Listify.Domain.Category", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Category.Category", b =>
                 {
                     b.Navigation("CategoryAttributes");
 
                     b.Navigation("Children");
                 });
 
-            modelBuilder.Entity("Listify.Domain.CategoryAttribute", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Category.CategoryAttribute", b =>
                 {
                     b.Navigation("CategoryAttributeValues");
                 });
@@ -619,18 +600,16 @@ namespace Listify.Infrastructure.Migrations
             modelBuilder.Entity("Listify.Domain.Entities.Chat.Conversation", b =>
                 {
                     b.Navigation("Messages");
-
-                    b.Navigation("Participants");
                 });
 
-            modelBuilder.Entity("Listify.Domain.Listing", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.Listing.Listing", b =>
                 {
                     b.Navigation("ListingAttributeValues");
 
                     b.Navigation("ListingImages");
                 });
 
-            modelBuilder.Entity("Listify.Domain.User", b =>
+            modelBuilder.Entity("Listify.Domain.Entities.User.User", b =>
                 {
                     b.Navigation("RefreshTokens");
                 });

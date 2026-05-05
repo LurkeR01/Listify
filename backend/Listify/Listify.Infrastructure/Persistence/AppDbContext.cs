@@ -21,7 +21,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ListingImage> ListingImages => Set<ListingImage>();
     public DbSet<UserRating> UserRatings => Set<UserRating>();
     public DbSet<Conversation> Conversations => Set<Conversation>();
-    public DbSet<ConversationParticipant> ConversationParticipants => Set<ConversationParticipant>();
     public DbSet<Message> Messages => Set<Message>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

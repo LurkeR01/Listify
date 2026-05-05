@@ -7,7 +7,8 @@ public class ResponseConversationDto
 {
     public Guid Id { get; set; }
     public ResponseListingPreviewDto ListingPreview { get; set; }
-    public List<ShortResponseUserDto> Participants { get; set; }
+    public ShortResponseUserDto Buyer { get; set; }
+    public ShortResponseUserDto Seller { get; set; }
     
     [MaxLength(20)]
     public List<MessageDto> LastMessages { get; set; }
