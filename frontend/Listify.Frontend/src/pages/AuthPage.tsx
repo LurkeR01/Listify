@@ -196,6 +196,7 @@ export function AuthPage() {
     try {
       await handleAuth()
     } catch (error) {
+      console.error("Authentication request failed:", error)
       if (axios.isAxiosError(error)) {
         if (isLogin && error.response?.status === 401) {
           setErrors((prev) => ({ ...prev, auth: "Невірний логин або пароль" }))

@@ -7,6 +7,7 @@ import { CreateListingPage } from "@/pages/CreateListingPage"
 import { EditListingPage } from "@/pages/EditListingPage"
 import { ProfilePage } from "@/pages/ProfilePage"
 import { EditProfilePage } from "@/pages/EditProfilePage"
+import { ChatsPage } from "@/pages/ChatsPage"
 import { MyListingsPage } from "./pages/MyListingsPage"
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
       <Route path="/my-listings/:id/edit" element={<EditListingPage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/profile/edit" element={<EditProfilePage />} />
+      <Route path="/chats" element={<ChatsPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/my-listings" element={<MyListingsPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />

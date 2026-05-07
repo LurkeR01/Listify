@@ -38,7 +38,10 @@ function validatePhone(phone: string) {
   return /^[\d\s\-+()]{7,}$/.test(phone)
 }
 
-function getSaveErrorMessage(error: unknown) {
+function getSaveErrorMessage(error: any) {
+  void error
+  return "Не вдалося оновити профіль. Перевірте дані та спробуйте ще раз."
+
   // Try to extract error from axios/fetch
   if (
     typeof error === "object" &&
@@ -208,6 +211,7 @@ export function useEditProfileForm(user: any, refreshCurrentUser: () => Promise<
       await refreshCurrentUser()
       navigate("/profile")
     } catch (error) {
+      console.error("Failed to update profile:", error)
       setSaveError(getSaveErrorMessage(error))
     } finally {
       setIsSaving(false)

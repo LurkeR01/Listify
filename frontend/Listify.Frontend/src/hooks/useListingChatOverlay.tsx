@@ -91,8 +91,8 @@ export function useListingChatOverlay(): UseListingChatOverlayResult {
         await connectionRef.current.invoke("SendMessage", conversation.id, text.trim())
         return true
       } catch (e) {
-        const message = e instanceof Error ? e.message : "Не вдалося надіслати повідомлення"
-        setError(message)
+        console.error("Failed to send chat message:", e)
+        setError("Не вдалося надіслати повідомлення. Спробуйте ще раз.")
         return false
       }
     },
@@ -171,8 +171,8 @@ export function useListingChatOverlay(): UseListingChatOverlayResult {
         await connection.start()
         await connection.invoke("JoinChat", conv.id)
       } catch (e) {
-        const message = e instanceof Error ? e.message : "Не вдалося відкрити чат"
-        setError(message)
+        console.error("Failed to open listing chat:", e)
+        setError("Не вдалося відкрити чат. Спробуйте ще раз.")
         void stopConnection()
       } finally {
         setIsLoading(false)

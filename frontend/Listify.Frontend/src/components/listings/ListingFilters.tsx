@@ -15,7 +15,7 @@ import {
   Text,
 } from "@chakra-ui/react"
 import { createListCollection } from "@chakra-ui/react"
-import { FiChevronDown, FiChevronUp, FiMapPin, FiSliders, FiTruck } from "react-icons/fi"
+import { FiChevronDown, FiChevronUp, FiSliders } from "react-icons/fi"
 import type { CategoryDto } from "@/DTOs/Category/CategoryDto";
 import type { CategoryAttributeDto } from "@/DTOs/Category/CategoryAttributeDto";
 import type { RequestCategoryAttributeValueDto } from "@/DTOs/Category/CategoryAttributeValueDto"
@@ -220,16 +220,6 @@ export function ListingFilters({
             </Stack>
           ))}
         </CheckboxGroup>
-
-        <Stack gap="2">
-          <Text fontWeight="medium" color="gray.700">Доставка</Text>
-          <Button justifyContent="start" variant="ghost" size="sm">
-            <Icon as={FiTruck} /> Доставка по Україні
-          </Button>
-          <Button justifyContent="start" variant="ghost" size="sm">
-            <Icon as={FiMapPin} /> Самовивіз
-          </Button>
-        </Stack>
 
         <Stack gap="2" position="relative">
           <Text fontWeight="medium" color="gray.700">Місто</Text>

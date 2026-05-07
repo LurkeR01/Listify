@@ -55,11 +55,8 @@ const toSuggestion = (value: ListingDetailDto["location"]): LocationSuggestion =
   return { name, area, ref, label, value: label }
 }
 
-const getErrorMessage = (error: unknown) => {
-  if (error instanceof Error && error.message) {
-    return error.message
-  }
-  return "Не вдалося зберегти зміни"
+const getErrorMessage = () => {
+  return "Не вдалося зберегти зміни. Перевірте дані та спробуйте ще раз."
 }
 
 const normalize = (value: unknown) => String(value ?? "").trim().toLowerCase()
@@ -339,7 +336,8 @@ export function EditListingPage() {
       setSaveSuccess("Зміни збережено")
       navigate("/my-listings")
     } catch (error) {
-      setSaveError(getErrorMessage(error))
+      console.error("Failed to update listing:", error)
+      setSaveError(getErrorMessage())
     } finally {
       setIsSaving(false)
     }

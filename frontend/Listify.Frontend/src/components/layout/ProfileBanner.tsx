@@ -1,7 +1,7 @@
 import type { ResponseUserDto } from "@/DTOs/User/UserDto"
-import { Box, Button, HStack, Icon, Stack, Text, Image } from "@chakra-ui/react"
+import { Box, Button, HStack, Icon, Image, Stack, Text } from "@chakra-ui/react"
 import type { IconType } from "react-icons"
-import { FiMessageCircle, FiStar, FiUser, FiList } from "react-icons/fi"
+import { FiList, FiMessageCircle, FiStar, FiUser } from "react-icons/fi"
 import { useNavigate } from "react-router-dom"
 
 type ProfileBannerProps = {
@@ -22,7 +22,7 @@ const bannerActions: BannerAction[] = [
     id: "profile",
     title: "Профіль",
     description: "Ваші особисті дані",
-    icon: FiUser
+    icon: FiUser,
   },
   {
     id: "my-listings",
@@ -34,14 +34,14 @@ const bannerActions: BannerAction[] = [
     id: "chats",
     title: "Чати",
     description: "Діалоги з покупцями та продавцями",
-    icon: FiMessageCircle
+    icon: FiMessageCircle,
   },
   {
     id: "ratings",
     title: "Рейтинги",
     description: "Відгуки та оцінки",
-    icon: FiStar
-  }
+    icon: FiStar,
+  },
 ]
 
 const resolveDisplayName = (user: ResponseUserDto | null) => {
@@ -53,6 +53,22 @@ export function ProfileBanner({ user, onLogout, onOpenProfile }: ProfileBannerPr
   const displayName = resolveDisplayName(user)
   const displayEmail = user?.email ?? "email@example.com"
   const navigate = useNavigate()
+
+  const handleActionClick = (actionId: string) => {
+    if (actionId === "profile") {
+      onOpenProfile()
+      return
+    }
+
+    if (actionId === "my-listings") {
+      navigate("/my-listings")
+      return
+    }
+
+    if (actionId === "chats") {
+      navigate("/chats")
+    }
+  }
 
   return (
     <Box
@@ -127,13 +143,7 @@ export function ProfileBanner({ user, onLogout, onOpenProfile }: ProfileBannerPr
             py="3"
             _hover={{ bg: "blue.50" }}
             _active={{ bg: "blue.100" }}
-            onClick={
-              action.id === "profile"
-                ? onOpenProfile
-                : action.id === "my-listings"
-                ? () => navigate("/my-listings")
-                : undefined
-            }
+            onClick={() => handleActionClick(action.id)}
           >
             <HStack gap="3" align="start" w="full">
               <Icon as={action.icon} boxSize="5" color="blue.600" mt="0.5" flexShrink={0} />

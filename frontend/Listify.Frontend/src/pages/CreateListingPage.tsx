@@ -43,11 +43,8 @@ const buildContactName = (user: ResponseUserDto | null) => {
   return [firstName, lastName].filter(Boolean).join(" ").trim()
 }
 
-const getErrorMessage = (error: unknown) => {
-  if (error instanceof Error && error.message) {
-    return error.message
-  }
-  return "Не вдалося опублікувати оголошення"
+const getErrorMessage = () => {
+  return "Не вдалося опублікувати оголошення. Перевірте дані та спробуйте ще раз."
 }
 
 export function CreateListingPage() {
@@ -230,7 +227,8 @@ export function CreateListingPage() {
               });
       }
     } catch (error) {
-      setPublishError(getErrorMessage(error))
+      console.error("Failed to create listing:", error)
+      setPublishError(getErrorMessage())
     } finally {
       setIsPublishing(false)
     }

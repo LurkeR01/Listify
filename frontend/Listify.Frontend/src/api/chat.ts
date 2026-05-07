@@ -3,11 +3,12 @@ import type { ConversationDto } from "@/DTOs/Chat/ConversationDto"
 import type { ListingPreviewDto } from "@/DTOs/Chat/ListingPreviewDto"
 import type { MessageDto } from "@/DTOs/Chat/MessageDto"
 import type { ShortResponseUserDto } from "@/DTOs/Chat/ShortResponseUserDto"
+import type { ChatThreadDto } from "@/DTOs/Chat/ChatThreadDto"
 import type { CityDto } from "@/DTOs/Location/CityDto"
 
 export type RequestConnectionDto = {
   listingId: string
-  sellerId: string
+  sellerId?: string
 }
 
 type ResponseListingPreviewApiDto = {
@@ -58,6 +59,8 @@ type ResponseConversationApiDto = {
   Seller?: ResponseShortUserApiDto
   participants?: ResponseShortUserApiDto[]
   Participants?: ResponseShortUserApiDto[]
+  messages?: ResponseMessageApiDto[]
+  Messages?: ResponseMessageApiDto[]
   lastMessages?: ResponseMessageApiDto[]
   LastMessages?: ResponseMessageApiDto[]
 }
@@ -89,14 +92,15 @@ const toListingPreview = (value: ResponseListingPreviewApiDto | null | undefined
   }
 }
 
-export const connectConversation = async (dto: RequestConnectionDto): Promise<ConversationDto> => {
-  const response = await api.post<ResponseConversationApiDto>("/chat/connect", {
-    listingId: dto.listingId,
-    sellerId: dto.sellerId,
+const sortMessagesByCreatedAt = (messages: MessageDto[]) => {
+  return [...messages].sort((a, b) => {
+    const aTime = new Date(a.createdAt).getTime()
+    const bTime = new Date(b.createdAt).getTime()
+    return (Number.isNaN(aTime) ? 0 : aTime) - (Number.isNaN(bTime) ? 0 : bTime)
   })
+}
 
-  const source = response.data
-
+const toConversation = (source: ResponseConversationApiDto): ConversationDto => {
   const responseParticipants = (source.participants ?? source.Participants ?? []).map(toShortUser)
   const buyer = toShortUser(source.buyer ?? source.Buyer)
   const seller = toShortUser(source.seller ?? source.Seller)
@@ -130,10 +134,48 @@ export const connectConversation = async (dto: RequestConnectionDto): Promise<Co
     }
   }
 
+  const sourceMessages = source.messages ?? source.Messages ?? source.lastMessages ?? source.LastMessages ?? []
+  const lastMessages = sortMessagesByCreatedAt(sourceMessages.map(toMessageWithParticipants))
+
   return {
     id: String(source.id ?? source.Id ?? ""),
     listingPreview: toListingPreview(source.listingPreview ?? source.ListingPreview),
     participants,
-    lastMessages: (source.lastMessages ?? source.LastMessages ?? []).map(toMessageWithParticipants),
+    lastMessages,
   }
+}
+
+export const connectConversation = async (dto: RequestConnectionDto): Promise<ConversationDto> => {
+  const response = await api.post<ResponseConversationApiDto>("/chat/connect", {
+    listingId: dto.listingId,
+  })
+
+  return toConversation(response.data)
+}
+
+export const getChatThreads = async (): Promise<ChatThreadDto[]> => {
+  const response = await api.get<ResponseConversationApiDto[]>("/chat")
+
+  return response.data.map((source) => {
+    const conversation = toConversation(source)
+    const buyer = toShortUser(source.buyer ?? source.Buyer)
+    const seller = toShortUser(source.seller ?? source.Seller)
+    const lastMessage = conversation.lastMessages.at(-1) ?? null
+
+    return {
+      id: conversation.id,
+      listingPreview: conversation.listingPreview,
+      buyer,
+      seller,
+      lastMessage,
+      messages: conversation.lastMessages,
+      updatedAt: lastMessage?.createdAt ?? "",
+    }
+  })
+}
+
+export const getChatHubUrl = (): string => {
+  const base = String(api.defaults.baseURL ?? "").trim()
+  if (!base) return "/chat"
+  return base.replace(/\/api\/?$/i, "") + "/chat"
 }

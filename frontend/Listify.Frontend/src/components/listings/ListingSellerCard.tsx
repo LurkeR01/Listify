@@ -3,6 +3,7 @@ import { LuMail, LuMessageCircle, LuPhone, LuStar } from "react-icons/lu"
 import type { ResponseUserDto } from "@/DTOs/User/UserDto"
 import { useListingChatOverlay } from "@/hooks/useListingChatOverlay"
 import { useAuth } from "@/auth/AuthContext"
+import { useState } from "react"
 
 type ListingSellerCardProps = {
   seller: ResponseUserDto
@@ -11,8 +12,11 @@ type ListingSellerCardProps = {
 
 export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps) {
   const displayName = [seller.firstName, seller.lastName].filter(Boolean).join(" ").trim() || seller.username || "Користувач"
+  const sellerPhone = seller.phoneNumber?.trim()
+  const [isPhoneVisible, setIsPhoneVisible] = useState(false)
   const { openChat, overlay } = useListingChatOverlay()
   const { user } = useAuth()
+  const isOwnListing = Boolean(user && user.id === seller.id)
 
   return (
     <>
@@ -34,7 +38,6 @@ export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps)
             <Heading size="sm">{displayName}</Heading>
             <HStack gap="1" color="gray.600">
               <Icon as={LuStar} boxSize="4" color="yellow.400" />
-              {/* <Text fontSize="sm">{seller.rating.toFixed(1)}</Text> */}
             </HStack>
           </Stack>
 
@@ -42,16 +45,18 @@ export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps)
 
           <Stack gap="3">
             <Button
-             colorPalette="blue"
-              size="lg" 
+              colorPalette="blue"
+              size="lg"
               gap="2"
-              disabled={!user || user.id === seller.id}>
+              disabled={!user || isOwnListing || !sellerPhone}
+              onClick={() => setIsPhoneVisible(true)}
+            >
               <Icon as={LuPhone} boxSize="4" />
-              Показати телефон
+              {isPhoneVisible ? sellerPhone : sellerPhone ? "Показати телефон" : "Телефон не вказано"}
             </Button>
             <Button
               variant="outline"
-              disabled={!user || user.id === seller.id}
+              disabled={!user || isOwnListing}
               colorPalette="blue"
               size="lg"
               gap="2"
@@ -60,12 +65,7 @@ export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps)
               <Icon as={LuMessageCircle} boxSize="4" />
               Написати
             </Button>
-            <Button 
-              variant="outline" 
-              disabled={!user || user.id === seller.id}
-              colorPalette="blue" 
-              size="lg" 
-              gap="2">
+            <Button variant="outline" disabled={!user || isOwnListing} colorPalette="blue" size="lg" gap="2">
               <Icon as={LuMail} boxSize="4" />
               Email продавцю
             </Button>
@@ -77,10 +77,10 @@ export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps)
             <Text fontSize="sm" color="gray.600" textAlign="center">
               Поради з безпеки
             </Text>
-            <List.Root display="grid" gap="1" fontSize="xs" color="gray.600" listStylePosition={"inside"}>
-              <List.Item> Зустрічайтесь у публічних місцях</List.Item>
-              <List.Item> Перевіряйте товар перед оплатою</List.Item>
-              <List.Item> Розрахунок після огляду</List.Item>
+            <List.Root display="grid" gap="1" fontSize="xs" color="gray.600" listStylePosition="inside">
+              <List.Item>Зустрічайтеся у публічних місцях</List.Item>
+              <List.Item>Перевіряйте товар перед оплатою</List.Item>
+              <List.Item>Розрахунок після огляду</List.Item>
             </List.Root>
           </Stack>
         </Stack>

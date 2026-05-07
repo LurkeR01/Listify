@@ -168,10 +168,11 @@ export function MyListingsPage() {
         title: "Оголошення видалено",
         type: "success",
       });
-    } catch (error: any) {
+    } catch (error) {
+      console.error("Failed to delete listing:", error)
       toaster.create({
         title: "Помилка",
-        description: error.response?.data?.message || "Не вдалося видалити оголошення",
+        description: "Не вдалося видалити оголошення. Спробуйте ще раз.",
         type: "error",
       });
     } finally {
@@ -197,10 +198,11 @@ export function MyListingsPage() {
         title: "Статус змінено",
         type: "success",
       });
-    } catch (error: any) {
+    } catch (error) {
+      console.error("Failed to change listing status:", error)
       toaster.create({
         title: "Помилка",
-        description: error.response?.data?.message || "Не вдалося змінити статус оголошення",
+        description: "Не вдалося змінити статус оголошення. Спробуйте ще раз.",
         type: "error",
       });
     }
