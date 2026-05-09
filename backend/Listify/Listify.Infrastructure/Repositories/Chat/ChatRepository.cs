@@ -44,6 +44,19 @@ public class ChatRepository : IChatRepository
             .FirstOrDefaultAsync(c => c.Id == conversationId, token);
     }
 
+    public async Task<List<Conversation>> GetForUserAsync(Guid userId, CancellationToken token)
+    {
+        return await _dbContext.Conversations
+            .Include(c => c.Listing)
+                .ThenInclude(l => l.ListingImages)
+            .Include(c => c.Buyer)
+            .Include(c => c.Seller)
+            .Include(c => c.Messages)
+                .ThenInclude(m => m.Sender)
+            .Where(c => c.BuyerId == userId || c.SellerId == userId)
+            .ToListAsync(token);
+    }
+
     public async Task<Conversation> CreateAsync(Conversation conversation, CancellationToken token)
     {
         await _dbContext.Conversations.AddAsync(conversation, token);

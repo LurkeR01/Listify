@@ -10,6 +10,5 @@ public class ResponseConversationDto
     public ShortResponseUserDto Buyer { get; set; }
     public ShortResponseUserDto Seller { get; set; }
     
-    [MaxLength(20)]
-    public List<MessageDto> LastMessages { get; set; }
+    public List<MessageDto> Messages { get; set; }
 }

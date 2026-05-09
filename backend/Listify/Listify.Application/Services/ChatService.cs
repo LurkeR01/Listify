@@ -65,4 +65,7 @@ public class ChatService
 
         return message;
     }
+
+    public async Task<List<Conversation>> GetConversationsForUser(Guid userId, CancellationToken token) =>
+        await _chatRepository.GetForUserAsync(userId, token);
 }

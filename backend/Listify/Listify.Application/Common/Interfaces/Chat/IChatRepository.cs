@@ -11,6 +11,7 @@ public interface IChatRepository
         CancellationToken token);
     
     Task<Conversation> GetByIdAsync(Guid conversationId, CancellationToken token);
+    Task<List<Conversation>> GetForUserAsync(Guid userId, CancellationToken token);
 
     Task<Conversation> CreateAsync(Conversation conversation, CancellationToken token);
     Task SaveChangesAsync(CancellationToken token);

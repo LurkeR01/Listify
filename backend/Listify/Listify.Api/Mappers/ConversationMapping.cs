@@ -45,7 +45,9 @@ public static class ConversationMapping
                 AvatarUrl = conversation.Seller?.AvatarUrl,
                 AvatarPublicId = conversation.Seller?.AvatarPublicId,
             },
-            LastMessages = conversation.Messages.Select(m => new MessageDto
+            Messages = conversation.Messages
+                .OrderBy(m => m.CreatedAt)
+                .Select(m => new MessageDto
             {
                 Id = m.Id,
                 Text = m.Text,

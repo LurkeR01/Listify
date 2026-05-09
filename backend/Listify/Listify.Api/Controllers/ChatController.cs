@@ -31,5 +31,15 @@ namespace Listify.Api.Controllers
 
             return Ok(conversation.ToResponse());
         }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetConversationsForUser( CancellationToken token)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var conversation = await _chatService.GetConversationsForUser(userId, token);
+            return Ok(conversation.Select(c => c.ToResponse()));
+        }
     }
 }
