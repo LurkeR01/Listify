@@ -126,7 +126,7 @@ public class ListingService
                 .AsNoTracking()
                 .Where(l => categoryIds.Contains(l.CategoryId));
         }
-        
+
         if (!string.IsNullOrWhiteSpace(request.SearchText))
             query = query.Where(l => EF.Functions.FreeText(l.Title, request.SearchText));
         

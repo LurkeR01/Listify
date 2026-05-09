@@ -33,9 +33,9 @@ export const defaultIcon: IconType = FiGrid;
 export const popularCategories = [
   "Електроніка",
   "Одяг та взуття",
-  "Дім та сад",
+  "Дім і сад",
   "Авто",
-  "Робота",
+  "Бізнес та послуги",
   "Хобі та відпочинок",
 ]
 

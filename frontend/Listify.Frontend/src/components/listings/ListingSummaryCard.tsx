@@ -17,7 +17,9 @@ export function ListingSummaryCard({ listing }: ListingSummaryCardProps) {
       <Flex justify="space-between" gap="4" wrap="wrap">
         <Box flex="1">
           <HStack gap="3" mb="3" align="start">
-            <Heading size="lg">{listing.title}</Heading>
+            <Heading size="3xl" fontWeight="semibold">
+              {listing.title}
+            </Heading>
           </HStack>
           <HStack gap="3" color="gray.600" fontSize="sm" flexWrap="wrap">
             <HStack gap="1">

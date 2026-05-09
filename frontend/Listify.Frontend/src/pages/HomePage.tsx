@@ -11,6 +11,7 @@ import { footerGroups, popularCategories } from "@/data/home-content"
 
 export function HomePage() {
   const [categories, setCategories] = useState<CategoryDto[]>([]);
+  const pupularCategories = categories.filter(category => popularCategories.includes(category.name));
 
   useEffect(() => {
     void getCategories().then(setCategories).catch(console.error);
@@ -22,7 +23,7 @@ export function HomePage() {
 
       <Container maxW="9xl" py={{ base: "6", md: "10" }}>
         <Stack gap={{ base: "10", md: "14" }}>
-          <HeroSection popularCategories={popularCategories} />
+          <HeroSection popularCategories={pupularCategories} />
           <CategoryGrid categories={categories} />
           <SellBanner />
         </Stack>

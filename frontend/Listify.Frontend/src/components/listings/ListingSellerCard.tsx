@@ -45,17 +45,6 @@ export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps)
 
           <Stack gap="3">
             <Button
-              colorPalette="blue"
-              size="lg"
-              gap="2"
-              disabled={!user || isOwnListing || !sellerPhone}
-              onClick={() => setIsPhoneVisible(true)}
-            >
-              <Icon as={LuPhone} boxSize="4" />
-              {isPhoneVisible ? sellerPhone : sellerPhone ? "Показати телефон" : "Телефон не вказано"}
-            </Button>
-            <Button
-              variant="outline"
               disabled={!user || isOwnListing}
               colorPalette="blue"
               size="lg"
@@ -64,6 +53,17 @@ export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps)
             >
               <Icon as={LuMessageCircle} boxSize="4" />
               Написати
+            </Button>
+            <Button
+              variant="outline"
+              colorPalette="blue"
+              size="lg"
+              gap="2"
+              disabled={!user || isOwnListing || !sellerPhone}
+              onClick={() => setIsPhoneVisible(true)}
+            >
+              <Icon as={LuPhone} boxSize="4" />
+              {isPhoneVisible ? sellerPhone : sellerPhone ? "Показати телефон" : "Телефон не вказано"}
             </Button>
             <Button variant="outline" disabled={!user || isOwnListing} colorPalette="blue" size="lg" gap="2">
               <Icon as={LuMail} boxSize="4" />
