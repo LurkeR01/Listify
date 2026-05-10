@@ -39,6 +39,24 @@ namespace Listify.Api.Controllers
             };
             return Ok(responseUserDto);
         }
+        
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetById(Guid userId)
+        {
+            var user = await _userService.GetUserById(userId);
+            ResponseUserDto responseUserDto = new()
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                RegisteredAt = user.RegisteredAt,
+                PhoneNumber = user.PhoneNumber,
+                Location = user.Location,
+                AvatarUrl = user.AvatarUrl,
+            };
+            return Ok(responseUserDto);
+        }
 
         [Authorize]
         [HttpPatch("edit")]

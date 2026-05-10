@@ -66,6 +66,11 @@ export const getCurrentUser = async () => {
   return toUser(response.data)
 }
 
+export const getUserById = async (id: string) => {
+  const response = await api.get<ResponseUserApiDto>(`/user/${id}`)
+  return toUser(response.data)
+}
+
 export const updateUserProfile = async (user: EditUserRequestDto) => {
   const response = await api.patch<ResponseUserApiDto | null>("/user/edit", user)
   return response.data ? toUser(response.data) : null

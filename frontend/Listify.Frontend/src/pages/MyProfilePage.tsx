@@ -87,7 +87,7 @@ function ContactItem({ icon, label, value }: ContactItemProps) {
   )
 }
 
-export function ProfilePage() {
+export function MyProfilePage() {
   const navigate = useNavigate()
   const { isAuthenticated, user } = useAuth()
 

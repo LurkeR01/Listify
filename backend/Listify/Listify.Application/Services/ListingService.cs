@@ -156,7 +156,9 @@ public class ListingService
             query = query.Where(l => l.Location.Ref == request.LocationRef);
         }
         
-        return await query.Select(l => new ResponseListingPreviewDto
+        return await query
+            .Where(l => l.Status == ListingStatus.Published)
+            .Select(l => new ResponseListingPreviewDto
         {
             Id = l.Id,
             Title = l.Title,

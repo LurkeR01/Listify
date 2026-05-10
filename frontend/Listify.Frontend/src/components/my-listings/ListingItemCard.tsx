@@ -6,9 +6,9 @@ import { ListingStatus } from "@/data/home-content"
 
 type ListingItemCardProps = {
   listing: ListingDto
-  onEdit: (id: string) => void
-  onDelete: (id: string) => void
-  onToggleStatus: (id: string, status: ListingStatus) => void
+  onEdit?: ((id: string) => void) | null
+  onDelete?: ((id: string) => void) | null
+  onToggleStatus?: ((id: string, status: ListingStatus) => void) | null
 }
 
 export function ListingItemCard({
@@ -44,7 +44,7 @@ export function ListingItemCard({
           <Flex justify="space-between" align="flex-start">
             <Stack gap="1">
               <Heading
-                size="md"
+                size="2xl"
                 color="gray.900"
                 _hover={{ color: "blue.600" }}
                 cursor="pointer"
@@ -81,61 +81,68 @@ export function ListingItemCard({
           {/* Actions */}
           <Flex justify="space-between" align="center">
             <HStack gap="3">
-              <Button
-                size="sm"
-                variant="ghost"
-                colorPalette="blue"
-                rounded="lg"
-                onClick={() => onEdit(listing.id)}
-              >
-                <Pencil size={16} /> Редагувати
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                colorPalette="red"
-                rounded="lg"
-                onClick={() => onDelete(listing.id)}
-              >
-                <Trash2 size={16} /> Видалити
-              </Button>
+              {onEdit ? (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  colorPalette="blue"
+                  rounded="lg"
+                  onClick={() => onEdit(listing.id)}
+                >
+                  <Pencil size={16} /> Редагувати
+                </Button>
+              ) : null}
+
+              {onDelete ? (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  colorPalette="red"
+                  rounded="lg"
+                  onClick={() => onDelete(listing.id)}
+                >
+                  <Trash2 size={16} /> Видалити
+                </Button>
+              ) : null}
             </HStack>
 
-            <Button
-              size="sm"
-              variant="outline"
-              colorPalette={listing.status === ListingStatus.Published ? "gray" : "green"}
-              rounded="lg"
-              onClick={() => onToggleStatus(listing.id, listing.status === ListingStatus.Published ? ListingStatus.Archived : ListingStatus.Published)}
-              disabled={listing.status === ListingStatus.Draft}
-            >
-              {(() => {
-                switch (listing.status) {
-                  case ListingStatus.Published:
-                    return (
-                      <>
-                        <PowerOff size={16} /> 
-                        <Text as="span" ml="2">Деактивувати</Text>
-                      </>
-                    )
-                  case ListingStatus.Draft:
-                    return (
-                      <>
-                        <Clock size={16} /> 
-                        <Text as="span" ml="2">На модерації</Text>
-                      </>
-                    )
-                  case ListingStatus.Archived:
-                  default:
-                    return (
-                      <>
-                        <Power size={16} /> 
-                        <Text as="span" ml="2">Активувати</Text>
-                      </>
-                    )
-                }
-              })()}
-            </Button>
+            {onToggleStatus ? (
+              <Button
+                size="sm"
+                variant="outline"
+                colorPalette={listing.status === ListingStatus.Published ? "gray" : "green"}
+                rounded="lg"
+                onClick={() => onToggleStatus(listing.id, listing.status === ListingStatus.Published ? ListingStatus.Archived : ListingStatus.Published)}
+                disabled={listing.status === ListingStatus.Draft}
+              >
+                {(() => {
+                  switch (listing.status) {
+                    case ListingStatus.Published:
+                      return (
+                        <>
+                          <PowerOff size={16} /> 
+                          <Text as="span" ml="2">Деактивувати</Text>
+                        </>
+                      )
+                    case ListingStatus.Draft:
+                      return (
+                        <>
+                          <Clock size={16} /> 
+                          <Text as="span" ml="2">На модерації</Text>
+                        </>
+                      )
+                    case ListingStatus.Archived:
+                    default:
+                      return (
+                        <>
+                          <Power size={16} /> 
+                          <Text as="span" ml="2">Активувати</Text>
+                        </>
+                      )
+                  }
+                })()}
+              </Button>
+            ) : null}
           </Flex>
         </Stack>
       </Flex>

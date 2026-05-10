@@ -100,10 +100,17 @@ namespace Listify.Api.Controllers
         }
 
         [Authorize]
-        [HttpGet("getForUser")]
-        public async Task<IActionResult> GetForUser(CancellationToken cancellationToken)
+        [HttpGet("getMyListings")]
+        public async Task<IActionResult> GetMyListings(CancellationToken cancellationToken)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var response = await _listingService.GetForUser(userId, cancellationToken);
+            return Ok(response);
+        }
+        
+        [HttpGet("getForUser/{userId}")]
+        public async Task<IActionResult> GetForUser(Guid userId, CancellationToken cancellationToken)
+        {
             var response = await _listingService.GetForUser(userId, cancellationToken);
             return Ok(response);
         }

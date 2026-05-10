@@ -1,6 +1,7 @@
 import { Badge, Box, Flex, HStack, Heading, Icon, IconButton, Text } from "@chakra-ui/react"
 import { LuFlag, LuHeart, LuMapPin, LuShare2 } from "react-icons/lu"
 import type { ListingDetailDto } from "@/DTOs/Listing/ListingDetailDto"
+import { toaster } from "@/components/ui/toaster"
 
 type ListingSummaryCardProps = {
   listing: ListingDetailDto
@@ -11,6 +12,25 @@ export function ListingSummaryCard({ listing }: ListingSummaryCardProps) {
     ? `${listing.location.name}, ${listing.location.area}`
     : listing.location.name
   const formattedPrice = `${new Intl.NumberFormat("uk-UA").format(listing.price)} грн`
+
+  const handleShare = async () => {
+    try {
+      const url = `${window.location.origin}/listing/${listing.id}`
+      await navigator.clipboard.writeText(url)
+      
+      toaster.create({
+        title: "Посилання скопійовано",
+        description: "Посилання на оголошення скопійовано в буфер обміну",
+        type: "success",
+      })
+    } catch (error) {
+      toaster.create({
+        title: "Помилка",
+        description: "Не вдалося скопіювати посилання",
+        type: "error",
+      })
+    }
+  }
 
   return (
     <Box rounded="2xl" borderWidth="1px" borderColor="blue.100" bg="white" p={{ base: "5", md: "6" }} boxShadow="sm">
@@ -38,7 +58,7 @@ export function ListingSummaryCard({ listing }: ListingSummaryCardProps) {
           </HStack>
         </Box>
         <HStack gap="2">
-          <IconButton aria-label="Поділитися" variant="outline" colorPalette="blue">
+          <IconButton aria-label="Поділитися" variant="outline" colorPalette="blue" onClick={handleShare}>
             <Icon as={LuShare2} boxSize="4" />
           </IconButton>
           <IconButton aria-label="Додати до обраного" variant="outline" colorPalette="blue">

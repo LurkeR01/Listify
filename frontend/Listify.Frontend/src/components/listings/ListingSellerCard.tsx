@@ -1,4 +1,5 @@
 import { Avatar, Box, Button, Heading, HStack, Icon, List, Separator, Stack, Text } from "@chakra-ui/react"
+import { Link } from "react-router-dom"
 import { LuMail, LuMessageCircle, LuPhone, LuStar } from "react-icons/lu"
 import type { ResponseUserDto } from "@/DTOs/User/UserDto"
 import { useListingChatOverlay } from "@/hooks/useListingChatOverlay"
@@ -32,9 +33,11 @@ export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps)
       >
         <Stack gap="4">
           <Stack align="center" textAlign="center" gap="2">
-            <Avatar.Root size="xl" bg="blue.100" color="blue.700">
-              {seller.avatarUrl ? <Avatar.Image src={seller.avatarUrl} alt={displayName} /> : <Avatar.Fallback name={displayName} />}
-            </Avatar.Root>
+            <Link to={`/user-profile/${seller.id}`} style={{ display: "inline-block" }}>
+              <Avatar.Root size="xl" bg="blue.100" color="blue.700" style={{ cursor: "pointer" }}>
+                {seller.avatarUrl ? <Avatar.Image src={seller.avatarUrl} alt={displayName} /> : <Avatar.Fallback name={displayName} />}
+              </Avatar.Root>
+            </Link>
             <Heading size="sm">{displayName}</Heading>
             <HStack gap="1" color="gray.600">
               <Icon as={LuStar} boxSize="4" color="yellow.400" />

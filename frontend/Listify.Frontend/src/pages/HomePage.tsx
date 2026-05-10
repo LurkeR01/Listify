@@ -11,10 +11,17 @@ import { footerGroups, popularCategories } from "@/data/home-content"
 
 export function HomePage() {
   const [categories, setCategories] = useState<CategoryDto[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const pupularCategories = categories.filter(category => popularCategories.includes(category.name));
 
   useEffect(() => {
-    void getCategories().then(setCategories).catch(console.error);
+    void getCategories().then((cats) => {
+      setCategories(cats);
+      setIsLoadingCategories(false);
+    }).catch((error) => {
+      console.error(error);
+      setIsLoadingCategories(false);
+    });
   }, []);
 
   return (
@@ -24,7 +31,7 @@ export function HomePage() {
       <Container maxW="9xl" py={{ base: "6", md: "10" }}>
         <Stack gap={{ base: "10", md: "14" }}>
           <HeroSection popularCategories={pupularCategories} />
-          <CategoryGrid categories={categories} />
+          <CategoryGrid categories={categories} isLoading={isLoadingCategories} />
           <SellBanner />
         </Stack>
       </Container>

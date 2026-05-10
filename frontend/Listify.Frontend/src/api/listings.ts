@@ -218,8 +218,8 @@ export const getListings = async (params: ListingsSearchParams) => {
   })
 }
 
-export const getListingsForUser = async () => {
-  const response = await api.get<ResponseListingPreviewDto[]>("/listing/getForUser",)
+export const getMyListings = async () => {
+  const response = await api.get<ResponseListingPreviewDto[]>("/listing/getMyListings",)
 
   return response.data.map((item) => {
     return {
@@ -234,6 +234,25 @@ export const getListingsForUser = async () => {
     } satisfies ListingDto
   })
 }
+
+
+export const getListingsForUser = async (userId: string) => {
+  const response = await api.get<ResponseListingPreviewDto[]>(`/listing/getForUser/${userId}`)
+
+  return response.data.map((item) => {
+    return {
+      id: String(item.id ?? ""),
+      title: String(item.title ?? ""),
+      categoryId: pickCategoryId(item),
+      publishedAt: pickPublishedAt(item),
+      price: Number(item.price ?? 0),
+      location: toCity(item.location),
+      status: toListingStatus(item.status) ?? ListingStatus.Published,
+      imageUrl: item.imageUrl ?? undefined,
+    } satisfies ListingDto
+  })
+}
+
 
 export const getListingById = async (id: string) => {
   const response = await api.get<ResponseListingDto>(`/listing/${id}`)
