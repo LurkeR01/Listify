@@ -47,6 +47,12 @@ public class UserRepository : IUserRepository
                 .SetProperty(p => p.AvatarPublicId, command.AvatarPublicId)
         );
     }
+
+    public async Task AddUserRatingAsync(UserRating userRating, CancellationToken token)
+    {
+        await _dbContext.UserRatings.AddAsync(userRating, token);
+        await _dbContext.SaveChangesAsync(token);
+    }
     
     public async Task SaveChangesAsync() => await _dbContext.SaveChangesAsync();
 }

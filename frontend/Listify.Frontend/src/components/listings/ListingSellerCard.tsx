@@ -66,7 +66,7 @@ export function ListingSellerCard({ seller, listingId }: ListingSellerCardProps)
               onClick={() => setIsPhoneVisible(true)}
             >
               <Icon as={LuPhone} boxSize="4" />
-              {isPhoneVisible ? sellerPhone : sellerPhone ? "Показати телефон" : "Телефон не вказано"}
+              {isPhoneVisible ? "+38" + sellerPhone : sellerPhone ? "Показати телефон" : "Телефон не вказано"}
             </Button>
             <Button variant="outline" disabled={!user || isOwnListing} colorPalette="blue" size="lg" gap="2">
               <Icon as={LuMail} boxSize="4" />

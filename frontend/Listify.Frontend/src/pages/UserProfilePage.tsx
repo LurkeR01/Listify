@@ -170,7 +170,7 @@ export function UserProfilePage() {
               onClick={() => setShowPhone(!showPhone)}
             >
               <Phone size={18} />
-              {showPhone ? mockUser.phone : "Показати телефон"}
+              {showPhone ? "+38" + apiUser?.phoneNumber : "Показати телефон"}
             </Button>
           </Flex>
         </Box>

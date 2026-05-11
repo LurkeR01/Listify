@@ -10,5 +10,6 @@ public interface IUserRepository
     Task<User?> GetByIdAsync(Guid id);
     Task AddAsync(User user);
     Task EditAsync(EditUserCommand command, Guid userId);
+    Task AddUserRatingAsync(UserRating userRating, CancellationToken token);
     Task SaveChangesAsync();
 }

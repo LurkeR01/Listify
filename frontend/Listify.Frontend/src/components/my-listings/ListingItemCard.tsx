@@ -1,5 +1,6 @@
 import { Box, Button, Flex, Heading, HStack, Image, Separator, Stack, Text } from "@chakra-ui/react"
 import { Clock, MapPin, Pencil, Power, PowerOff, Trash2 } from "lucide-react"
+import { Link } from "react-router-dom"
 import type { ListingDto } from "@/DTOs/Listing/ListingDto"
 import { ListingStatus } from "@/data/home-content"
 
@@ -30,27 +31,32 @@ export function ListingItemCard({
     >
       <Flex gap="6" align="center" direction={{ base: "column", sm: "row" }}>
         {/* Image */}
-        <Image
-          src={listing.imageUrl ?? "/placeholder.png"}
-          alt={listing.title}
-          w={{ base: "full", sm: "240px" }}
-          h="160px"
-          objectFit="cover"
-          rounded="xl"
-        />
+        <Link to={`/listing/${listing.id}`}>
+          <Image
+            src={listing.imageUrl ?? "/placeholder.png"}
+            alt={listing.title}
+            w={{ base: "full", sm: "240px" }}
+            h="160px"
+            objectFit="cover"
+            rounded="xl"
+          />
+        </Link>
 
         {/* Content */}
         <Stack flex="1" gap="3">
           <Flex justify="space-between" align="flex-start">
             <Stack gap="1">
-              <Heading
-                size="2xl"
-                color="gray.900"
-                _hover={{ color: "blue.600" }}
-                cursor="pointer"
-              >
-                {listing.title}
-              </Heading>
+              <Link to={`/listing/${listing.id}`}>
+                <Heading
+                  as="span"
+                  size="2xl"
+                  color="gray.900"
+                  _hover={{ color: "blue.600" }}
+                  cursor="pointer"
+                >
+                  {listing.title}
+                </Heading>
+              </Link>
               {/* <HStack gap="1" color="gray.500" fontSize="xs">
                 {listing.categoryPath.map((cat, i) => (
                   <HStack key={cat} gap="1">
