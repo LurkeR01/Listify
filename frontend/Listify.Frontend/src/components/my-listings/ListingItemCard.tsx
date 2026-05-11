@@ -1,8 +1,11 @@
-import { Box, Button, Flex, Heading, HStack, Image, Separator, Stack, Text } from "@chakra-ui/react"
+import { Box, Button, Flex, Heading, HStack, Image, Separator, Stack, Text, IconButton, Icon } from "@chakra-ui/react"
 import { Clock, MapPin, Pencil, Power, PowerOff, Trash2 } from "lucide-react"
 import { Link } from "react-router-dom"
 import type { ListingDto } from "@/DTOs/Listing/ListingDto"
 import { ListingStatus } from "@/data/home-content"
+import { LuHeart } from "react-icons/lu"
+import { useState } from "react"
+
 
 
 type ListingItemCardProps = {
@@ -18,6 +21,7 @@ export function ListingItemCard({
   onDelete,
   onToggleStatus,
 }: ListingItemCardProps) {
+  const [liked, setLiked] = useState(false)
   return (
     <Box
       bg="white"
@@ -57,14 +61,11 @@ export function ListingItemCard({
                   {listing.title}
                 </Heading>
               </Link>
-              {/* <HStack gap="1" color="gray.500" fontSize="xs">
-                {listing.categoryPath.map((cat, i) => (
-                  <HStack key={cat} gap="1">
-                    <Text>{cat}</Text>
-                    {i < listing.categoryPath.length - 1 && <ChevronRight size={12} />}
-                  </HStack>
-                ))}
-              </HStack> */}
+              {listing.publishedAt ? (
+                <Text color="gray.500" fontSize="sm">
+                  Опубліковано {new Date(listing.publishedAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}
+                </Text>
+              ) : null}
             </Stack>
             <Text fontSize="xl" fontWeight="bold" color="blue.600">
               {listing.price.toLocaleString()} грн
@@ -76,10 +77,6 @@ export function ListingItemCard({
               <MapPin size={14} />
               <Text>{listing.location.name} • {listing.location.area}</Text>
             </HStack>
-            {/* <HStack gap="1">
-              <Eye size={14} />
-              <Text>{listing.views} переглядів</Text>
-            </HStack> */}
           </HStack>
 
           <Separator borderColor="gray.50" />
@@ -111,44 +108,51 @@ export function ListingItemCard({
                 </Button>
               ) : null}
             </HStack>
+            <HStack gap="2">
+              {onToggleStatus ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  colorPalette={listing.status === ListingStatus.Published ? "gray" : "green"}
+                  rounded="lg"
+                  onClick={() => onToggleStatus(listing.id, listing.status === ListingStatus.Published ? ListingStatus.Archived : ListingStatus.Published)}
+                  disabled={listing.status === ListingStatus.Draft}
+                >
+                  {(() => {
+                    switch (listing.status) {
+                      case ListingStatus.Published:
+                        return (
+                          <>
+                            <PowerOff size={16} /> 
+                            <Text as="span" ml="2">Деактивувати</Text>
+                          </>
+                        )
+                      case ListingStatus.Draft:
+                        return (
+                          <>
+                            <Clock size={16} /> 
+                            <Text as="span" ml="2">На модерації</Text>
+                          </>
+                        )
+                      case ListingStatus.Archived:
+                      default:
+                        return (
+                          <>
+                            <Power size={16} /> 
+                            <Text as="span" ml="2">Активувати</Text>
+                          </>
+                        )
+                    }
+                  })()}
+                </Button>
+              ) : null}
 
-            {onToggleStatus ? (
-              <Button
-                size="sm"
-                variant="outline"
-                colorPalette={listing.status === ListingStatus.Published ? "gray" : "green"}
-                rounded="lg"
-                onClick={() => onToggleStatus(listing.id, listing.status === ListingStatus.Published ? ListingStatus.Archived : ListingStatus.Published)}
-                disabled={listing.status === ListingStatus.Draft}
-              >
-                {(() => {
-                  switch (listing.status) {
-                    case ListingStatus.Published:
-                      return (
-                        <>
-                          <PowerOff size={16} /> 
-                          <Text as="span" ml="2">Деактивувати</Text>
-                        </>
-                      )
-                    case ListingStatus.Draft:
-                      return (
-                        <>
-                          <Clock size={16} /> 
-                          <Text as="span" ml="2">На модерації</Text>
-                        </>
-                      )
-                    case ListingStatus.Archived:
-                    default:
-                      return (
-                        <>
-                          <Power size={16} /> 
-                          <Text as="span" ml="2">Активувати</Text>
-                        </>
-                      )
-                  }
-                })()}
-              </Button>
-            ) : null}
+              {!onEdit && !onDelete && !onToggleStatus ? (
+                <IconButton size="sm" aria-label="Додати до обраного" variant="outline" colorPalette="blue" onClick={() => setLiked(!liked)}>
+                  <Icon as={LuHeart} boxSize="4" color={liked ? "red.500" : undefined} />
+                </IconButton>
+              ) : null}
+            </HStack>
           </Flex>
         </Stack>
       </Flex>

@@ -68,4 +68,14 @@ public class ChatService
 
     public async Task<List<Conversation>> GetConversationsForUser(Guid userId, CancellationToken token) =>
         await _chatRepository.GetForUserAsync(userId, token);
+
+    public async Task<Conversation> GetConversation(Guid listingId, Guid buyerId, Guid sellerId,
+        CancellationToken token)
+    {
+        var conversation = await _chatRepository.GetConversation(listingId, buyerId, sellerId, token);
+        if (conversation == null)
+            throw new NotFoundException("Conversation not found");
+        
+        return conversation;
+    }
 }

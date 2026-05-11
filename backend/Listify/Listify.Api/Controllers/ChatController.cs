@@ -20,7 +20,7 @@ namespace Listify.Api.Controllers
 
         [Authorize]
         [HttpPost("connect")]
-        public async Task<IActionResult> GetConversation([FromBody] RequestConnectionDto dto, CancellationToken token)
+        public async Task<IActionResult> GetOrCreateConversation([FromBody] RequestConnectionDto dto, CancellationToken token)
         {
             var buyerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var conversation = await _chatService.GetOrCreateConversation(
@@ -29,6 +29,15 @@ namespace Listify.Api.Controllers
                 token
             );
 
+            return Ok(conversation.ToResponse());
+        }
+
+        [Authorize]
+        [HttpPost("get")]
+        public async Task<IActionResult> GetConversatoin([FromBody] RequestConversationDto dto, CancellationToken token)
+        {
+            var buyerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var conversation = await _chatService.GetConversation(dto.ListingId, buyerId, dto.SellerId, token);
             return Ok(conversation.ToResponse());
         }
 

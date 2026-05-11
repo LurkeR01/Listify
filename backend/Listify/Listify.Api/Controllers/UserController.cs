@@ -14,12 +14,12 @@ namespace Listify.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
-        
+
         public UserController(UserService userService)
         {
             _userService = userService;
         }
-        
+
         [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> Me()
@@ -39,7 +39,7 @@ namespace Listify.Api.Controllers
             };
             return Ok(responseUserDto);
         }
-        
+
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetById(Guid userId)
         {
@@ -81,6 +81,25 @@ namespace Listify.Api.Controllers
             };
 
             await _userService.EditUser(command, userId);
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("rate")]
+        public async Task<IActionResult> RateUser(UserRatingDto dto, CancellationToken token)
+        {
+            var fromUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            await _userService.RateUser(
+                dto.RatedUserId,
+                dto.Rating,
+                dto.Comment,
+                fromUserId,
+                dto.ListingId,
+                token
+                );
+            
             
             return Ok();
         }

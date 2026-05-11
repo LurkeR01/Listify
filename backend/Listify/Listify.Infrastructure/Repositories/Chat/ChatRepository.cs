@@ -65,5 +65,10 @@ public class ChatRepository : IChatRepository
         return await GetByIdAsync(conversation.Id, token);
     }
 
+    public async Task<Conversation> GetConversation(Guid listingId, Guid buyerId, Guid sellerId,
+        CancellationToken token)
+        => await _dbContext.Conversations.FirstOrDefaultAsync(c =>
+            c.ListingId == listingId && c.BuyerId == buyerId && c.SellerId == sellerId);
+
     public async Task SaveChangesAsync(CancellationToken token) => await _dbContext.SaveChangesAsync(token);
 }

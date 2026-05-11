@@ -196,7 +196,7 @@ public class ListingService
                     Area = l.Location.Area,
                 },
                 Status = l.Status,
-            
+                PublishedAt = l.CreatedOn,
                 ImageUrl = l.ListingImages
                     .Where(i => i.Order == 0)
                     .Select(i => i.Url)

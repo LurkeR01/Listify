@@ -13,6 +13,7 @@ public class ResponseListingPreviewDto
     public decimal Price  { get; set; }
     public int? CategoryId { get; set; }
     public LocationDto Location { get; set; }
+    public DateTime PublishedAt { get; set; }
     public ListingStatus? Status { get; set; }
     public string? ImageUrl { get; set; }
 }
