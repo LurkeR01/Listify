@@ -93,6 +93,7 @@ namespace Listify.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetOne([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var listing = await _listingService.GetListingAsync(id, cancellationToken);

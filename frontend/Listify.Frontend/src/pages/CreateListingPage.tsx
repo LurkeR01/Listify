@@ -215,7 +215,7 @@ export function CreateListingPage() {
       if (createdId) {
         navigate(`/listing/${createdId}`)
         toaster.create({
-                title: "Оголошення видалено",
+                title: "Оголошення створено",
                 type: "success",
               });
       } else {

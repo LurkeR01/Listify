@@ -1,6 +1,6 @@
 import api from "./axios"
 import type { CityDto } from "@/DTOs/Location/CityDto"
-import type { EditUserRequestDto, ResponseUserDto } from "@/DTOs/User/UserDto"
+import type { EditUserRequestDto, ResponseUserDto, UserRatingRequestDto, ResponseUserRatingDto, UserRatingDto } from "@/DTOs/User/UserDto"
 
 type ResponseLocationApiDto = {
   Name?: string | null
@@ -75,3 +75,29 @@ export const updateUserProfile = async (user: EditUserRequestDto) => {
   const response = await api.patch<ResponseUserApiDto | null>("/user/edit", user)
   return response.data ? toUser(response.data) : null
 }
+
+export const rateUser = async (dto: UserRatingRequestDto) => {
+  await api.post<void>("/user/rate", dto)
+}
+
+export const getUserRatingForListing = async (listingId: string): Promise<UserRatingDto | null> => {
+  const response = await api.get<ResponseUserRatingDto>(`/user/getByUserForListing/${listingId}`)
+  const src = response.data
+  if (!src) return null
+
+  const fromUserRaw = src.fromUser ?? src.FromUser
+  const toUserRaw = src.toUser ?? src.ToUser
+
+  return {
+    id: String(src.id ?? src.Id ?? ""),
+    rating: Number(src.rating ?? src.Rating ?? 0),
+    comment: (src.comment ?? src.Comment) ?? undefined,
+    fromUserId: String(src.fromUserId ?? src.FromUserId ?? ""),
+    toUserId: String(src.toUserId ?? src.ToUserId ?? ""),
+    listingId: String(src.listingId ?? src.ListingId ?? ""),
+    createdAt: String(src.createdAt ?? src.CreatedAt ?? ""),
+    fromUser: fromUserRaw ? toUser(fromUserRaw as any) : undefined,
+    toUser: toUserRaw ? toUser(toUserRaw as any) : undefined,
+  }
+}
+

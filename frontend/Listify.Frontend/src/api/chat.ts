@@ -153,6 +153,15 @@ export const connectConversation = async (dto: RequestConnectionDto): Promise<Co
   return toConversation(response.data)
 }
 
+export const getConversation = async (dto: RequestConnectionDto): Promise<ConversationDto> => {
+  const response = await api.post<ResponseConversationApiDto>("/chat/get", {
+    listingId: dto.listingId,
+    sellerId: dto.sellerId,
+  })
+
+  return toConversation(response.data)
+}
+
 export const getChatThreads = async (): Promise<ChatThreadDto[]> => {
   const response = await api.get<ResponseConversationApiDto[]>("/chat")
 

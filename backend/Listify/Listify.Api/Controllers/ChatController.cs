@@ -43,7 +43,7 @@ namespace Listify.Api.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetConversationsForUser( CancellationToken token)
+        public async Task<IActionResult> GetConversationsForUser(CancellationToken token)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 

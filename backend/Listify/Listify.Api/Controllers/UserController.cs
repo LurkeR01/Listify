@@ -103,5 +103,15 @@ namespace Listify.Api.Controllers
             
             return Ok();
         }
+
+        [Authorize]
+        [HttpGet("getByUserForListing/{listingId}")]
+        public async Task<IActionResult> GetByUserForListing(Guid listingId, CancellationToken token)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            
+            var usreRating = await _userService.GetByUserForListing(userId, listingId, token);
+            return Ok(usreRating);
+        }
     }
 }

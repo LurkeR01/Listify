@@ -38,11 +38,17 @@ public class UserService
             throw new NotFoundException("User not found");
 
         var chat = await _chatRepository.GetByParticipantsAsync(listingId, fromUserId, ratedUserId, token);
-        if (chat.Messages.Count(m => m.SenderId == ratedUserId) > 5)
-            throw new ForbiddenException(
-                "Rating is only available after meaningful communication. You need at least 5 messages exchanged with the seller.");
+        // if (chat.Messages.Count(m => m.SenderId == ratedUserId) > 4)
+        //     throw new ForbiddenException(
+        //         "Rating is only available after meaningful communication. You need at least 5 messages exchanged with the seller.");
         
         var userRating = UserRating.Create(rating, comment, fromUserId, ratedUserId, listingId);
         await _userRepository.AddUserRatingAsync(userRating, token);
+    }
+
+    public async Task<UserRating> GetByUserForListing(Guid userId, Guid listingId, CancellationToken token)
+    {
+        var userRating = await _userRepository.GetByUserForListing(userId, listingId, token) ?? throw new NotFoundException("User not found");
+        return userRating;
     }
 }

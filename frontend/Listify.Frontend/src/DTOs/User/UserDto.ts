@@ -25,6 +25,46 @@ export type EditUserRequestDto = {
   AvatarPublicId?: string | null
 }
 
+export type UserRatingRequestDto = {
+  RatedUserId: string
+  ListingId: string
+  Rating: number
+  Comment?: string | null
+}
+
+export type ResponseUserRatingDto = {
+  id?: string
+  Id?: string
+  fromUserId?: string
+  FromUserId?: string
+  toUserId?: string
+  ToUserId?: string
+  listingId?: string
+  ListingId?: string
+  rating?: number
+  Rating?: number
+  comment?: string | null
+  Comment?: string | null
+  createdAt?: string
+  CreatedAt?: string
+  fromUser?: ResponseUserDto | null
+  FromUser?: ResponseUserDto | null
+  toUser?: ResponseUserDto | null
+  ToUser?: ResponseUserDto | null
+}
+
+export type UserRatingDto = {
+  id: string
+  rating: number
+  comment?: string
+  fromUserId: string
+  toUserId: string
+  listingId: string
+  createdAt: string
+  fromUser?: ResponseUserDto
+  toUser?: ResponseUserDto
+}
+
 export type ResponseUserDto = {
   id: string
   username?: string

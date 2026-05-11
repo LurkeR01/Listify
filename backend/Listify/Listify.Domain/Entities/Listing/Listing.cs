@@ -55,7 +55,7 @@ public class Listing
             PublishedByUserId = publishedByUserId,
             CategoryId = categoryId,
             CreatedOn = DateTime.Now,
-            Status = ListingStatus.Draft
+            Status = ListingStatus.Published
         };
     }
 
