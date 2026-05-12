@@ -9,9 +9,7 @@ type ListingActionsProps = {
   publishError: string | null
   publishSuccess: string | null
   helperText?: string
-  previewLabel?: string
   publishLabel?: string
-  previewIcon?: IconType
   publishIcon?: IconType
 }
 
@@ -21,10 +19,8 @@ export function ListingActions({
   isPublishDisabled,
   publishError,
   publishSuccess,
-  helperText = "Попередній перегляд і публікація будуть доступні після перевірки даних.",
-  previewLabel = "Перегляд",
+  helperText = "Публікація буде доступна після перевірки даних.",
   publishLabel = "Опублікувати",
-  previewIcon = FiCamera,
   publishIcon = FiPlus,
 }: ListingActionsProps) {
   return (
@@ -52,10 +48,6 @@ export function ListingActions({
           </Text>
         ) : null}
         <Stack gap="2">
-          <Button variant="outline" colorPalette="blue">
-            <Icon as={previewIcon} />
-            {previewLabel}
-          </Button>
           <Button
             colorPalette="blue"
             loading={isPublishing}

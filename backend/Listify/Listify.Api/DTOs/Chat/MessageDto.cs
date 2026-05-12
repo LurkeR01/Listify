@@ -1,4 +1,4 @@
-﻿namespace Listify.Api.DTOs.Chat;
+﻿namespace Listify.Api.DTOs.User;
 
 public class MessageDto
 {

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
-import { getUserById } from "@/api/user"
+import { getUserById, getUserRatings } from "@/api/user"
 import { getListingsForUser } from "@/api/listings"
-import type { ResponseUserDto } from "@/DTOs/User/UserDto"
+import type { ResponseUserDto, UserRatingDto } from "@/DTOs/User/UserDto"
 import {
   Box,
   Container,
@@ -30,25 +30,9 @@ import { ListingSorting } from "@/components/listings/ListingSorting"
 import type { CategoryDto } from "@/DTOs/Category/CategoryDto"
 import { getCategories } from "@/api/categories"
 
-// --- Філлерні дані ---
 // Using ListingStatus from shared data/home-content
 
-const mockUser = {
-  name: "Олександр Коваленко",
-  avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200&h=200&fit=crop",
-  rating: 4.8,
-  reviewsCount: 24,
-  registeredAt: "березень 2022",
-  phone: "+380 67 123 45 67",
-  about: "Займаюся продажем якісної техніки вже понад 3 роки. Всі товари проходять перевірку перед відправкою. Завжди радий відповісти на ваші запитання!"
-}
-
 // Listings will be loaded from API
-
-const mockReviews = [
-  { id: 1, itemName: "iPhone 15 Pro Max", rating: 5, user: "Ігор В.", date: "12.04.2024", comment: "Все супер, продавець пунктуальний." },
-  { id: 2, itemName: "AirPods Pro 2", rating: 4, user: "Олена М.", date: "05.04.2024", comment: "Товар відповідає опису." }
-]
 
 // --- Допоміжні компоненти ---
 const RatingStars = ({ val }: { val: number }) => (
@@ -73,6 +57,9 @@ export function UserProfilePage() {
   const [categories, setCategories] = useState<CategoryDto[]>([])
   const [selectedCategory, setSelectedCategory] = useState<CategoryDto | null>(null)
   const [sortOption, setSortOption] = useState<SortingOption>(sortingOptions[0])
+  const [ratings, setRatings] = useState<UserRatingDto[]>([])
+  const [avgRating, setAvgRating] = useState<number | null>(null)
+  const [isLoadingRatings, setIsLoadingRatings] = useState(false)
 
   useEffect(() => {
     if (!userId) return
@@ -113,6 +100,25 @@ export function UserProfilePage() {
     }
   }, [userId])
 
+  useEffect(() => {
+    if (!userId) return
+    let mounted = true
+    setIsLoadingRatings(true)
+    getUserRatings(userId)
+      .then((userRatings) => {
+        if (!mounted) return
+        setRatings(userRatings)
+        const avg = userRatings.length > 0
+          ? userRatings.reduce((s, r) => s + (typeof r.rating === "number" ? r.rating : Number(r.rating)), 0) / userRatings.length
+          : null
+        setAvgRating(avg !== null ? Number(avg) : null)
+      })
+      .catch((err) => console.error(err))
+      .finally(() => { if (mounted) setIsLoadingRatings(false) })
+
+    return () => { mounted = false }
+  }, [userId])
+
   const { sortedListings } = useListingsFilterSort({
     listings,
     categories,
@@ -121,9 +127,9 @@ export function UserProfilePage() {
     sortOption,
   })
 
-  const displayName = apiUser ? [apiUser.firstName, apiUser.lastName].filter(Boolean).join(" ").trim() || apiUser.username || mockUser.name : mockUser.name
-  const avatar = apiUser?.avatarUrl ?? mockUser.avatar
-  const registeredAtRaw = apiUser?.registeredAt ?? mockUser.registeredAt
+  const displayName = apiUser ? ([apiUser.firstName, apiUser.lastName].filter(Boolean).join(" ").trim() || apiUser.username || "Користувач") : "Користувач"
+  const avatar = apiUser?.avatarUrl ?? undefined
+  const registeredAtRaw = apiUser?.registeredAt ?? ""
   const registeredAtFormatted = (() => {
     try {
       const d = new Date(registeredAtRaw)
@@ -133,6 +139,22 @@ export function UserProfilePage() {
     } catch {}
     return String(registeredAtRaw)
   })()
+
+  const totalRatings = ratings.length
+  const distribution = [5, 4, 3, 2, 1].map((num) => {
+    const count = ratings.filter((r) => Math.round(r.rating) === num).length
+    const pct = totalRatings > 0 ? Math.round((count / totalRatings) * 100) : 0
+    return { num, count, pct }
+  })
+
+  const formatDate = (iso?: string) => {
+    try {
+      if (!iso) return ""
+      const d = new Date(iso)
+      if (!isNaN(d.getTime())) return d.toLocaleDateString("uk", { day: "2-digit", month: "2-digit", year: "numeric" })
+    } catch {}
+    return String(iso ?? "")
+  }
 
   return (
     <Box bg="gray.50" minH="100vh">
@@ -151,8 +173,12 @@ export function UserProfilePage() {
                 <HStack gap="4">
                   <HStack gap="1">
                     <Star size={18} fill="#EAB308" color="#EAB308" />
-                    <Text fontWeight="bold">{mockUser.rating}</Text>
-                    <Text color="gray.500">({mockUser.reviewsCount} відгуків)</Text>
+                    {isLoadingRatings ? (
+                      <Spinner size="xs" />
+                    ) : (
+                      <Text fontWeight="bold">{avgRating !== null && avgRating !== undefined ? avgRating.toFixed(1) : "—"}</Text>
+                    )}
+                    <Text color="gray.500">({totalRatings} відгуків)</Text>
                   </HStack>
                   <HStack gap="1" color="gray.500" fontSize="sm">
                     <Calendar size={16} />
@@ -170,7 +196,7 @@ export function UserProfilePage() {
               onClick={() => setShowPhone(!showPhone)}
             >
               <Phone size={18} />
-              {showPhone ? "+38" + apiUser?.phoneNumber : "Показати телефон"}
+              {showPhone ? (apiUser?.phoneNumber ? `+38${apiUser.phoneNumber}` : "Телефон недоступний") : "Показати телефон"}
             </Button>
           </Flex>
         </Box>
@@ -269,18 +295,22 @@ export function UserProfilePage() {
               {/* Rating Stats */}
               <Box bg="white" p="6" rounded="3xl" w={{ lg: "300px" }} h="fit-content" shadow="sm">
                  <Stack align="center" gap="2" mb="4">
-                   <Text fontSize="5xl" fontWeight="black" color="blue.600">{mockUser.rating}</Text>
-                   <RatingStars val={5} />
+                   {isLoadingRatings ? (
+                     <Spinner size="lg" color="blue.600" />
+                   ) : (
+                     <Text fontSize="5xl" fontWeight="black" color="blue.600">{avgRating !== null && avgRating !== undefined ? avgRating.toFixed(1) : "—"}</Text>
+                   )}
+                   <RatingStars val={avgRating ? Math.round(avgRating) : 0} />
                    <Text color="gray.500" fontSize="sm">Середня оцінка</Text>
                  </Stack>
                  <Stack gap="3">
-                   {[5, 4, 3, 2, 1].map(num => (
-                     <HStack key={num} justify="space-between">
-                       <Text fontSize="sm" fontWeight="medium">{num} зірок</Text>
+                   {distribution.map(d => (
+                     <HStack key={d.num} justify="space-between">
+                       <Text fontSize="sm" fontWeight="medium">{d.num} зірок</Text>
                        <Box flex="1" h="2" bg="gray.100" rounded="full" mx="3">
-                          <Box h="full" bg="yellow.400" rounded="full" w={num === 5 ? "80%" : "10%"} />
+                          <Box h="full" bg="yellow.400" rounded="full" w={`${d.pct}%`} />
                        </Box>
-                       <Text fontSize="xs" color="gray.400">{num === 5 ? "20" : "1"}</Text>
+                       <Text fontSize="xs" color="gray.400">{d.count}</Text>
                      </HStack>
                    ))}
                  </Stack>
@@ -288,21 +318,30 @@ export function UserProfilePage() {
 
               {/* Reviews List */}
               <Stack flex="1" gap="4">
-                {mockReviews.map(review => (
-                  <Box key={review.id} bg="white" p="5" rounded="2xl" shadow="sm" borderWidth="1px" borderColor="gray.100">
-                    <Flex justify="space-between" mb="3">
-                      <Stack gap="0">
-                        <Text fontWeight="bold" fontSize="lg">{review.itemName}</Text>
-                        <RatingStars val={review.rating} />
-                      </Stack>
-                      <Text color="gray.400" fontSize="sm">{review.date}</Text>
-                    </Flex>
-                    <Text color="gray.700" mb="3">{review.comment}</Text>
-                    <HStack color="gray.500" fontSize="xs">
-                      <Text>Від: <Text as="span" fontWeight="bold" color="gray.900">{review.user}</Text></Text>
-                    </HStack>
+                {ratings.length === 0 ? (
+                  <Box bg="white" p="6" rounded="2xl" borderWidth="1px" borderColor="gray.100">
+                    <Text color="gray.600">У цього користувача немає відгуків.</Text>
                   </Box>
-                ))}
+                ) : (
+                  ratings.map((rating) => {
+                    const listing = listings.find(l => l.id === rating.listingId)
+                    return (
+                      <Box key={rating.id} bg="white" p="5" rounded="2xl" shadow="sm" borderWidth="1px" borderColor="gray.100">
+                        <Flex justify="space-between" mb="3">
+                          <Stack gap="0">
+                            <Text fontWeight="bold" fontSize="lg">{listing?.title ?? rating.listingId}</Text>
+                            <RatingStars val={rating.rating} />
+                          </Stack>
+                          <Text color="gray.400" fontSize="sm">{formatDate(rating.createdAt)}</Text>
+                        </Flex>
+                        <Text color="gray.700" mb="3">{rating.comment}</Text>
+                        <HStack color="gray.500" fontSize="xs">
+                          <Text>Від: <Text as="span" fontWeight="bold" color="gray.900">{rating.fromUser?.firstName ?? "Користувач"}</Text></Text>
+                        </HStack>
+                      </Box>
+                    )
+                  })
+                )}
               </Stack>
             </Flex>
           </Tabs.Content>
@@ -312,7 +351,7 @@ export function UserProfilePage() {
             <Box bg="white" p="8" rounded="3xl" shadow="sm" borderWidth="1px" borderColor="gray.100">
                <Heading size="md" mb="4">Про продавця</Heading>
                <Text color="gray.700" lineHeight="tall">
-                 {mockUser.about}
+                 {(apiUser as any)?.about ?? "Про продавця інформації немає."}
                </Text>
             </Box>
           </Tabs.Content>

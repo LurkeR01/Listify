@@ -96,8 +96,47 @@ export const getUserRatingForListing = async (listingId: string): Promise<UserRa
     toUserId: String(src.toUserId ?? src.ToUserId ?? ""),
     listingId: String(src.listingId ?? src.ListingId ?? ""),
     createdAt: String(src.createdAt ?? src.CreatedAt ?? ""),
-    fromUser: fromUserRaw ? toUser(fromUserRaw as any) : undefined,
-    toUser: toUserRaw ? toUser(toUserRaw as any) : undefined,
+    fromUser: fromUserRaw ? toShortUser(fromUserRaw as any) : undefined,
+    toUser: toUserRaw ? toShortUser(toUserRaw as any) : undefined,
   }
+}
+
+const toUserRating = (src: ResponseUserRatingDto): UserRatingDto => {
+  const fromUserRaw = src.fromUser ?? src.FromUser
+  const toUserRaw = src.toUser ?? src.ToUser
+
+  return {
+    id: String(src.id ?? src.Id ?? ""),
+    rating: Number(src.rating ?? src.Rating ?? 0),
+    comment: (src.comment ?? src.Comment) ?? undefined,
+    fromUserId: String(src.fromUserId ?? src.FromUserId ?? ""),
+    toUserId: String(src.toUserId ?? src.ToUserId ?? ""),
+    listingId: String(src.listingId ?? src.ListingId ?? ""),
+    createdAt: String(src.createdAt ?? src.CreatedAt ?? ""),
+    fromUser: fromUserRaw ? toShortUser(fromUserRaw as any) : undefined,
+    toUser: toUserRaw ? toShortUser(toUserRaw as any) : undefined,
+  }
+}
+
+const toShortUser = (value: any) => {
+  return {
+    id: String(value?.Id ?? value?.id ?? ""),
+    firstName: String(value?.FirstName ?? value?.firstName ?? ""),
+    avatarUrl: String(value?.AvatarUrl ?? value?.avatarUrl ?? "") || undefined,
+    avatarPublicId: String(value?.AvatarPublicId ?? value?.avatarPublicId ?? "") || undefined,
+  }
+}
+
+export const getAvgRating = async (userId: string): Promise<number | null> => {
+  const response = await api.get<number>(`/user/getAvgRating/${userId}`)
+  const data = response.data
+  if (data === null || data === undefined) return null
+  return Number(data)
+}
+
+export const getUserRatings = async (userId: string): Promise<UserRatingDto[]> => {
+  const response = await api.get<ResponseUserRatingDto[]>(`/user/getUserRatings/${userId}`)
+  const src = response.data ?? []
+  return src.map(s => toUserRating(s))
 }
 

@@ -1,4 +1,5 @@
 ﻿using Listify.Api.DTOs.Chat;
+using Listify.Api.DTOs.User;
 using Listify.Application.DTOs;
 using Listify.Domain.Entities.Chat;
 

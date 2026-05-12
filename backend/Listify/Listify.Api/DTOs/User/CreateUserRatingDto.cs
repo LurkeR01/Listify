@@ -1,6 +1,6 @@
 ﻿namespace Listify.Api.DTOs.User;
 
-public class UserRatingDto
+public class CreateUserRatingDto
 {
     public Guid RatedUserId { get; set; }
     public Guid ListingId { get; set; }

@@ -1,4 +1,5 @@
 import type { CityDto } from "../Location/CityDto"
+import type { ShortResponseUserDto } from "../Chat/ShortResponseUserDto"
 
 export type RegisterUserRequestDto = {
   username?: string
@@ -47,10 +48,10 @@ export type ResponseUserRatingDto = {
   Comment?: string | null
   createdAt?: string
   CreatedAt?: string
-  fromUser?: ResponseUserDto | null
-  FromUser?: ResponseUserDto | null
-  toUser?: ResponseUserDto | null
-  ToUser?: ResponseUserDto | null
+  fromUser?: ShortResponseUserDto | null
+  FromUser?: ShortResponseUserDto | null
+  toUser?: ShortResponseUserDto | null
+  ToUser?: ShortResponseUserDto | null
 }
 
 export type UserRatingDto = {
@@ -61,8 +62,8 @@ export type UserRatingDto = {
   toUserId: string
   listingId: string
   createdAt: string
-  fromUser?: ResponseUserDto
-  toUser?: ResponseUserDto
+  fromUser?: ShortResponseUserDto
+  toUser?: ShortResponseUserDto
 }
 
 export type ResponseUserDto = {

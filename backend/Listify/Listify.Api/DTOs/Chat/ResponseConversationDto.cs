@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Listify.Api.DTOs.User;
 using Listify.Application.DTOs;
 
 namespace Listify.Api.DTOs.Chat;

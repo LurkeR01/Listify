@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Listify.Api.DTOs.Listing;
 using Listify.Api.DTOs.User;
+using Listify.Api.Mappers;
 using Listify.Application.DTOs.User;
 using Listify.Application.DTOs;
 using Listify.Application.Services;
@@ -87,7 +88,7 @@ namespace Listify.Api.Controllers
 
         [Authorize]
         [HttpPost("rate")]
-        public async Task<IActionResult> RateUser(UserRatingDto dto, CancellationToken token)
+        public async Task<IActionResult> RateUser(CreateUserRatingDto dto, CancellationToken token)
         {
             var fromUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
@@ -112,6 +113,14 @@ namespace Listify.Api.Controllers
             
             var usreRating = await _userService.GetByUserForListing(userId, listingId, token);
             return Ok(usreRating);
+        }
+        
+
+        [HttpGet("getUserRatings/{userId}")]
+        public async Task<IActionResult> GetUserRatings(Guid userId, CancellationToken token)
+        {
+            var userRatings = await _userService.GetUserRatings(userId, token);
+            return Ok(userRatings.Select(ur => ur.ToResponse()));
         }
     }
 }

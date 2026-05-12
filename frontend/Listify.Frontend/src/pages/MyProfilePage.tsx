@@ -1,4 +1,5 @@
 import { useAuth } from "@/auth/AuthContext"
+import { useEffect, useState } from "react"
 import { Footer } from "@/components/layout/Footer"
 import { Header } from "@/components/layout/Header"
 import { footerGroups } from "@/data/home-content"
@@ -27,6 +28,10 @@ import {
   FiUser,
 } from "react-icons/fi"
 import { useNavigate } from "react-router-dom"
+import { getMyListings } from "@/api/listings"
+import { getUserRatings } from "@/api/user"
+import type { ListingDto } from "@/DTOs/Listing/ListingDto"
+import { ListingStatus } from "@/data/home-content"
 
 const formatRegisteredAt = (value: string | Date | undefined) => {
   if (!value) return "-"
@@ -98,6 +103,39 @@ export function MyProfilePage() {
   const locationLabel = user?.location
     ? [user.location.name, user.location.area].filter(Boolean).join(", ").trim()
     : "Не вказано"
+
+  const [myListings, setMyListings] = useState<ListingDto[]>([])
+  const [isLoadingMyListings, setIsLoadingMyListings] = useState(false)
+  const [isLoadingRatings, setIsLoadingRatings] = useState(false)
+  const [avgRating, setAvgRating] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!user?.id) return
+    let mounted = true
+    setIsLoadingMyListings(true)
+    setIsLoadingRatings(true)
+
+    getMyListings()
+      .then((listingsRes) => {
+        if (!mounted) return
+        setMyListings(listingsRes)
+      })
+      .catch((err) => console.error(err))
+      .finally(() => { if (mounted) setIsLoadingMyListings(false) })
+
+    getUserRatings(user.id)
+      .then((ratingsRes) => {
+        if (!mounted) return
+        const avg = ratingsRes.length > 0
+          ? ratingsRes.reduce((s, r) => s + (typeof r.rating === 'number' ? r.rating : Number(r.rating)), 0) / ratingsRes.length
+          : null
+        setAvgRating(avg !== null ? Number(avg) : null)
+      })
+      .catch((err) => console.error(err))
+      .finally(() => { if (mounted) setIsLoadingRatings(false) })
+
+    return () => { mounted = false }
+  }, [user?.id])
 
   if (!isAuthenticated) {
     return (
@@ -248,54 +286,57 @@ export function MyProfilePage() {
               </Stack>
             </Box>
 
-            <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap="4">
-              <Box
-                rounded="xl"
-                borderWidth="1px"
-                borderColor="blue.100"
-                bg="white"
-                p="5"
-                boxShadow="sm"
-                textAlign="center"
-              >
-                <Icon as={FiTag} boxSize="5" color="blue.600" />
-                <Text mt="2" fontSize="3xl" fontWeight="bold" color="gray.900">
-                  -
-                </Text>
-                <Text color="gray.600">Активні оголошення</Text>
-              </Box>
+            <Grid templateColumns={{ base: "1fr", md: "repeat(2, minmax(0, 280px))" }} gap="4" justifyContent="center">
+                <Box
+                  rounded="xl"
+                  borderWidth="1px"
+                  borderColor="blue.100"
+                  bg="white"
+                  p="5"
+                  boxShadow="sm"
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  justifyContent="center"
+                  textAlign="center"
+                >
+                  <Icon as={FiTag} boxSize="5" color="blue.600" />
+                  {isLoadingMyListings ? (
+                    <Skeleton height="6" width="20" />
+                  ) : (
+                    <Text mt="2" fontSize="3xl" fontWeight="bold" color="gray.900">
+                      {(() => {
+                        const count = myListings.filter((l) => l.status === ListingStatus.Published).length
+                        return count > 0 ? String(count) : "-"
+                      })()}
+                    </Text>
+                  )}
+                  <Text color="gray.600">Активні оголошення</Text>
+                </Box>
 
-              <Box
-                rounded="xl"
-                borderWidth="1px"
-                borderColor="blue.100"
-                bg="white"
-                p="5"
-                boxShadow="sm"
-                textAlign="center"
-              >
-                <Icon as={FiUser} boxSize="5" color="blue.600" />
-                <Text mt="2" fontSize="3xl" fontWeight="bold" color="gray.900">
-                  -
-                </Text>
-                <Text color="gray.600">Успішні угоди</Text>
-              </Box>
-
-              <Box
-                rounded="xl"
-                borderWidth="1px"
-                borderColor="blue.100"
-                bg="white"
-                p="5"
-                boxShadow="sm"
-                textAlign="center"
-              >
-                <Icon as={FiStar} boxSize="5" color="blue.600" />
-                <Text mt="2" fontSize="3xl" fontWeight="bold" color="gray.900">
-                  -
-                </Text>
-                <Text color="gray.600">Середній рейтинг</Text>
-              </Box>
+                <Box
+                  rounded="xl"
+                  borderWidth="1px"
+                  borderColor="blue.100"
+                  bg="white"
+                  p="5"
+                  boxShadow="sm"
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  justifyContent="center"
+                  textAlign="center"
+                >
+                  <Icon as={FiStar} boxSize="5" color="blue.600" />
+                  {isLoadingRatings ? (
+                    <Skeleton height="6" width="20" />
+                  ) : (
+                    <Text mt="2" fontSize="3xl" fontWeight="bold" color="gray.900">
+                      {avgRating !== null && avgRating !== undefined ? avgRating.toFixed(1) : "-"}
+                    </Text>
+                  )}
+                  <Text color="gray.600">Середній рейтинг</Text>
+                </Box>
             </Grid>
           </Stack>
         </Container>

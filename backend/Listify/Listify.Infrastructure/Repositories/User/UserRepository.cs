@@ -54,9 +54,16 @@ public class UserRepository : IUserRepository
         await _dbContext.SaveChangesAsync(token);
     }
 
-    public async Task<UserRating> GetByUserForListing(Guid userId, Guid listingId, CancellationToken token)
+    public async Task<UserRating> GetRatingByUserForListing(Guid userId, Guid listingId, CancellationToken token)
         => await _dbContext.UserRatings.FirstOrDefaultAsync(ur => ur.FromUserId == userId && ur.ListingId == listingId,
             token);
+    
+
+    public async Task<List<UserRating>> GetUserRatings(Guid userId, CancellationToken token)
+        => await _dbContext.UserRatings
+            .Include(ur => ur.FromUser)
+            .Include(ur => ur.ToUser)
+            .Where(ur => ur.ToUserId == userId).ToListAsync(token);
     
     public async Task SaveChangesAsync() => await _dbContext.SaveChangesAsync();
 }
