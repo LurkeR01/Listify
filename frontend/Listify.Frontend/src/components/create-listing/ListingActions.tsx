@@ -1,6 +1,6 @@
 import { Box, Button, Heading, Icon, Stack, Text } from "@chakra-ui/react"
 import type { IconType } from "react-icons"
-import { FiCamera, FiPlus } from "react-icons/fi"
+import { FiPlus } from "react-icons/fi"
 
 type ListingActionsProps = {
   onPublish: () => void

@@ -67,6 +67,11 @@ export function ProfileBanner({ user, onLogout, onOpenProfile }: ProfileBannerPr
 
     if (actionId === "chats") {
       navigate("/chats")
+      return
+    }
+
+    if (actionId === "ratings") {
+      navigate("/profile/ratings")
     }
   }
 

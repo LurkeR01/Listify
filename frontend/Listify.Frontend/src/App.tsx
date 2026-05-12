@@ -10,6 +10,7 @@ import { EditProfilePage } from "@/pages/EditProfilePage"
 import { ChatsPage } from "@/pages/ChatsPage"
 import { MyListingsPage } from "./pages/MyListingsPage"
 import { UserProfilePage } from "./pages/UserProfilePage"
+import { ProfileRatingsPage } from "./pages/ProfileRatingsPage"
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/my-listings/:id/edit" element={<EditListingPage />} />
       <Route path="/profile" element={<MyProfilePage />} />
       <Route path="/profile/edit" element={<EditProfilePage />} />
+      <Route path="/profile/ratings" element={<ProfileRatingsPage />} />
       <Route path="/chats" element={<ChatsPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/my-listings" element={<MyListingsPage />} />
