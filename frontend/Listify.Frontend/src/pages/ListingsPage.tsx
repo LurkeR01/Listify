@@ -72,8 +72,8 @@ export function ListingsPage() {
             categoryId: subCategoryId ?? categoryId,
             searchText: searchText,
             locationRef: locationRef.trim() || undefined,
-            minPrice: minPrice ?? undefined,
-            maxPrice: maxPrice ?? undefined,
+            minPrice: minPrice !== null ? Math.max(0, minPrice) : undefined,
+            maxPrice: maxPrice !== null ? Math.max(0, maxPrice) : undefined,
             attributeFilters: selectedAttributes,
           }),
           getCategories(),
@@ -183,11 +183,34 @@ export function ListingsPage() {
                 </Flex>
               </Flex>
 
-              <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap="4">
-                {sortedListings.map((item, index) => (
-                  <ListingCard key={`${item.id}-${index}`} listing={item} />
-                ))}
-              </SimpleGrid>
+              {sortedListings.length === 0 ? (
+                <Box
+                  rounded="2xl"
+                  borderWidth="1px"
+                  borderColor="blue.100"
+                  bg="white"
+                  p="6"
+                  boxShadow="sm"
+                >
+                  <Stack gap="3" align="start">
+                    <Text fontWeight="semibold" color="gray.800">
+                      За заданими фільтрами оголошень не знайдено
+                    </Text>
+                    <Text color="gray.600">
+                      Спробуйте змінити фільтри або скинути їх.
+                    </Text>
+                    <Button size="sm" colorPalette="blue" variant="outline" onClick={handleResetFilters}>
+                      Скинути фільтри
+                    </Button>
+                  </Stack>
+                </Box>
+              ) : (
+                <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap="4">
+                  {sortedListings.map((item, index) => (
+                    <ListingCard key={`${item.id}-${index}`} listing={item} />
+                  ))}
+                </SimpleGrid>
+              )}
             </Stack>
           </Grid>
         </Stack>

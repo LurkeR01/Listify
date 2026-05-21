@@ -22,7 +22,7 @@ public class ConversationConfigurations : IEntityTypeConfiguration<Conversation>
         builder.HasOne(c => c.Listing)
             .WithMany()
             .HasForeignKey(c => c.ListingId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(c => c.Buyer)
             .WithMany()

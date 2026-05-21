@@ -22,7 +22,7 @@ public class UserRatingConfigurations : IEntityTypeConfiguration<UserRating>
         builder.HasOne(ur => ur.Listing)
             .WithMany()
             .HasForeignKey(ur => ur.ListingId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(ur => new { ur.ListingId, ur.FromUserId, ur.ToUserId }).IsUnique();
     }

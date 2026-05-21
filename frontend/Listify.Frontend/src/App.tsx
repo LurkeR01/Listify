@@ -11,8 +11,13 @@ import { ChatsPage } from "@/pages/ChatsPage"
 import { MyListingsPage } from "./pages/MyListingsPage"
 import { UserProfilePage } from "./pages/UserProfilePage"
 import { ProfileRatingsPage } from "./pages/ProfileRatingsPage"
+import { useEffect } from "react"
 
 function App() {
+  useEffect(() => {
+    document.title = "Listify";
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />

@@ -22,6 +22,13 @@ import type { RequestCategoryAttributeValueDto } from "@/DTOs/Category/CategoryA
 import { useEffect, useRef, useState } from "react"
 import { useLocationSuggestions } from "@/hooks/useLocationSuggestions"
 
+function parseNonNegativeNumber(value: string): number | null {
+  if (!value) return null
+  const parsed = Number(value)
+  if (!Number.isFinite(parsed)) return null
+  return Math.max(0, parsed)
+}
+
 type ListingFiltersProps = {
   subcategories: CategoryDto[],
   attributes?: CategoryAttributeDto[],
@@ -59,6 +66,7 @@ export function ListingFilters({
    }: ListingFiltersProps) {
   const [expandedAttrIds, setExpandedAttrIds] = useState<Set<number>>(() => new Set())
   const [isLocationFocused, setIsLocationFocused] = useState(false)
+  const locationInputRef = useRef<HTMLInputElement | null>(null)
   const prevAttrIdsKey = useRef<string>("")
   const { suggestions: locationSuggestions, isLoading: isLoadingLocations } =
     useLocationSuggestions(location)
@@ -155,12 +163,18 @@ export function ListingFilters({
           <Text fontWeight="medium" color="gray.700">Ціна</Text>
           <HStack>
             <Input size="sm" placeholder="Від" 
+              type="number"
+              min={0}
+              step={1}
               value={minPrice ?? ""}
-              onChange={(e) => setMinPrice?.(e.target.value ? Number(e.target.value) : null)}
+              onChange={(e) => setMinPrice?.(parseNonNegativeNumber(e.target.value))}
               />
             <Input size="sm" placeholder="До" 
+              type="number"
+              min={0}
+              step={1}
               value={maxPrice ?? ""}
-              onChange={(e) => setMaxPrice?.(e.target.value ? Number(e.target.value) : null)}
+              onChange={(e) => setMaxPrice?.(parseNonNegativeNumber(e.target.value))}
               />
           </HStack>
         </Stack>
@@ -227,6 +241,7 @@ export function ListingFilters({
             size="sm"
             placeholder="Наприклад, Київ"
             value={location}
+            ref={locationInputRef}
             onFocus={() => setIsLocationFocused(true)}
             onBlur={() => {
               window.setTimeout(() => {
@@ -236,6 +251,12 @@ export function ListingFilters({
             onChange={(event) => {
               setLocation?.(event.target.value)
               setLocationRef?.("")
+              // Після вибору міста з dropdown ми вручну ховаємо список (setIsLocationFocused(false)).
+              // Якщо користувач одразу починає редагувати значення (фокус лишається на інпуті),
+              // onFocus не спрацює повторно — тому вмикаємо показ списку на введенні.
+              if (document.activeElement === locationInputRef.current) {
+                setIsLocationFocused(true)
+              }
             }}
           />
 
