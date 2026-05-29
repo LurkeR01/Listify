@@ -1,6 +1,7 @@
 ﻿using Listify.Application.Exceptions;
 using Listify.Application.Exceptions.AuthExceptions;
 using Listify.Domain.Exceptions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Listify.Api.MIddleware;
 
@@ -23,25 +24,65 @@ public class ExceptionHandlingMiddleware
         {
             await HandleExceptionAsync(context, ex);
         }
-        // catch (Exception)
-        // {
-        //     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        //     await context.Response.WriteAsJsonAsync( new { error = "Internal Server Error" });
-        // }
+        catch (Exception)
+        {
+            await WriteProblemDetailsAsync(
+                context,
+                StatusCodes.Status500InternalServerError,
+                "Internal Server Error",
+                "An unexpected error occurred.");
+        }
     }
 
     private static async Task HandleExceptionAsync(HttpContext context, DomainException ex)
     {
-        context.Response.StatusCode = ex switch
+        var statusCode = ex switch
         {
             NotFoundException => StatusCodes.Status404NotFound,
             ForbiddenException => StatusCodes.Status403Forbidden,
             AlreadyExistsException => StatusCodes.Status409Conflict,
             InvalidCredentialsException => StatusCodes.Status401Unauthorized,
             InvalidRefreshTokenException => StatusCodes.Status401Unauthorized,
+            ValidationException => StatusCodes.Status400BadRequest,
+            BadRequestException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status400BadRequest,
         };
         
-        await context.Response.WriteAsJsonAsync( new { error = ex.Message });
+        await WriteProblemDetailsAsync(
+            context,
+            statusCode,
+            GetTitle(statusCode),
+            ex.Message);
     }
+
+    private static async Task WriteProblemDetailsAsync(
+        HttpContext context,
+        int statusCode,
+        string title,
+        string detail)
+    {
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/problem+json";
+
+        var problemDetails = new ProblemDetails
+        {
+            Status = statusCode,
+            Title = title,
+            Detail = detail,
+            Instance = context.Request.Path
+        };
+
+        await context.Response.WriteAsJsonAsync(problemDetails);
+    }
+
+    private static string GetTitle(int statusCode) => statusCode switch
+    {
+        StatusCodes.Status400BadRequest => "Bad Request",
+        StatusCodes.Status401Unauthorized => "Unauthorized",
+        StatusCodes.Status403Forbidden => "Forbidden",
+        StatusCodes.Status404NotFound => "Not Found",
+        StatusCodes.Status409Conflict => "Conflict",
+        StatusCodes.Status500InternalServerError => "Internal Server Error",
+        _ => "Error"
+    };
 }

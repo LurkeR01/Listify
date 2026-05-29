@@ -37,7 +37,7 @@ public class ListingService
     {
         int validCount = await _categoryRepository.CountValidAttributesAsync(command);
         if (validCount != command.ListingAttributeDtos.Count()) 
-            throw new Exception("Invalid attribute");
+            throw new ValidationException("Invalid attribute");
         
         var location = Location.Create(
             command.Location.Name, 
@@ -73,7 +73,7 @@ public class ListingService
             throw new NotFoundException("Listing not found");
         
         if (listing.PublishedByUserId != userId)
-            throw new UnauthorizedAccessException();
+            throw new ForbiddenException("You are not allowed to update this listing");
 
         listing.Update(
             command.Title,
@@ -107,7 +107,7 @@ public class ListingService
             throw new NotFoundException("Listing not found");
         
         if (listing.PublishedByUserId != userId)
-            throw new UnauthorizedAccessException();
+            throw new ForbiddenException("You are not allowed to delete this listing");
         
         await _listingRepository.DeleteListingAsync(listingId, token);
     }
@@ -215,7 +215,7 @@ public class ListingService
             throw new NotFoundException("Listing not found");
         
         if (listing.PublishedByUserId != userId)
-            throw new UnauthorizedAccessException();
+            throw new ForbiddenException("You are not allowed to update this listing");
         
         await _listingRepository.UpdateStatusAsync(listingId, status, token);
     } 

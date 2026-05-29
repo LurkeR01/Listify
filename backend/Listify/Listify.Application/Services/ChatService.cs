@@ -22,6 +22,8 @@ public class ChatService
         CancellationToken token)
     {
         var listing = await _listingRepository.GetListingAsNoTrackingAsync(listingId, token);
+        if (listing is null) throw new NotFoundException("Listing not found");
+
         var sellerId = listing.PublishedByUserId;
         var existing = await _chatRepository.GetByParticipantsAsync(
             listingId,
@@ -50,14 +52,14 @@ public class ChatService
     public async Task<Message> SendMessageAsync(Guid conversationId, Guid userId, string text, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(text))
-            throw new Exception("Empty message");
+            throw new BadRequestException("Empty message");
 
         var conversation = await _chatRepository.GetByIdAsync(conversationId, token);
         if (conversation == null)
-            throw new Exception("Conversation not found");
+            throw new NotFoundException("Conversation not found");
 
         if (conversation.SellerId != userId && conversation.BuyerId != userId)
-            throw new Exception("Forbidden");
+            throw new ForbiddenException("You are not allowed to send messages in this conversation");
         
         var message = Message.Create(conversationId, userId, text);
         conversation.AddMessage(message);
