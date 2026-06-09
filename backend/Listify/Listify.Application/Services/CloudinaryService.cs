@@ -1,5 +1,6 @@
-﻿using CloudinaryDotNet;
-using Microsoft.Extensions.Configuration;
+using CloudinaryDotNet;
+using Listify.Application.Common.Options;
+using Microsoft.Extensions.Options;
 
 namespace Listify.Application.Services;
 
@@ -7,14 +8,15 @@ public class CloudinaryService
 {
     private readonly Cloudinary _cloudinary;
 
-    public CloudinaryService(IConfiguration configuration)
+    public CloudinaryService(IOptions<CloudinaryOptions> cloudinaryOptions)
     {
+        var options = cloudinaryOptions.Value;
         var account = new Account(
-            configuration["Cloudinary:Cloud_Name"],
-            configuration["Cloudinary:Api_Key"],
-            configuration["Cloudinary:Api_Secret"]
+            options.CloudName,
+            options.ApiKey,
+            options.ApiSecret
         );
-        
+
         _cloudinary = new Cloudinary(account);
     }
 

@@ -4,11 +4,12 @@ using System.Security.Cryptography;
 using System.Text;
 using Listify.Application.Exceptions;
 using Listify.Application.Exceptions.AuthExceptions;
+using Listify.Application.Common.Options;
 using Listify.Application.Interfaces;
 using Listify.Domain;
 using Listify.Domain.Entities.Token;
 using Listify.Domain.Entities.User;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Listify.Application.Services;
@@ -17,16 +18,16 @@ public class AuthService
 {
     private readonly IUserRepository _usersRepository;
     private readonly IRefreshTokenRepository _refreshTokensRepository;
-    private readonly IConfiguration _config;
+    private readonly JwtOptions _jwtOptions;
 
     public AuthService(
         IUserRepository usersRepository,
         IRefreshTokenRepository refreshTokensRepository,
-        IConfiguration config)
+        IOptions<JwtOptions> jwtOptions)
     {
         _usersRepository = usersRepository;
         _refreshTokensRepository = refreshTokensRepository;
-        _config = config;
+        _jwtOptions = jwtOptions.Value;
     }
 
 
@@ -57,9 +58,6 @@ public class AuthService
 
     public async Task<(string AccessToken, string RefreshToken)> LoginAsync(string email, string password)
     {
-        if (email == string.Empty || password == string.Empty)
-            throw new InvalidCredentialsException();
-
         var user = await _usersRepository.GetByEmailAsync(email);
         if (user == null)
             throw new InvalidCredentialsException();
@@ -149,14 +147,14 @@ public class AuthService
             new Claim(ClaimTypes.Name, user.FirstName)
         };
         
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         
         var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
+            issuer: _jwtOptions.Issuer,
+            audience: _jwtOptions.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(15),
+            expires: DateTime.UtcNow.AddMinutes(_jwtOptions.AccessTokenMinutes),
             signingCredentials: creds
         );
         

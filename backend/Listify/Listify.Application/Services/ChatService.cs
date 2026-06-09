@@ -51,9 +51,6 @@ public class ChatService
     
     public async Task<Message> SendMessageAsync(Guid conversationId, Guid userId, string text, CancellationToken token)
     {
-        if (string.IsNullOrWhiteSpace(text))
-            throw new BadRequestException("Empty message");
-
         var conversation = await _chatRepository.GetByIdAsync(conversationId, token);
         if (conversation == null)
             throw new NotFoundException("Conversation not found");
@@ -70,6 +67,26 @@ public class ChatService
 
     public async Task<List<Conversation>> GetConversationsForUser(Guid userId, CancellationToken token) =>
         await _chatRepository.GetForUserAsync(userId, token);
+
+    public async Task<List<Message>> GetMessagesForConversation(
+        Guid conversationId,
+        Guid userId,
+        int page,
+        int pageSize,
+        CancellationToken token)
+    {
+        var conversation = await _chatRepository.GetByIdAsync(conversationId, token);
+        if (conversation == null)
+            throw new NotFoundException("Conversation not found");
+
+        if (conversation.SellerId != userId && conversation.BuyerId != userId)
+            throw new ForbiddenException("You are not allowed to view this conversation");
+
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        return await _chatRepository.GetMessagesAsync(conversationId, page, pageSize, token);
+    }
 
     public async Task<Conversation> GetConversation(Guid listingId, Guid buyerId, Guid sellerId,
         CancellationToken token)

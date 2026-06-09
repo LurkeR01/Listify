@@ -28,6 +28,8 @@ import type { RequestCategoryAttributeValueDto } from "@/DTOs/Category/CategoryA
 
 const sorting = ["Спочатку нові", "Дешевші", "Дорожчі", "Поруч зі мною"]
 
+const pageSize = 20
+
 export function ListingsPage() {
   const { id } = useParams()
   const categoryId = id ? parseInt(id) : undefined
@@ -43,6 +45,8 @@ export function ListingsPage() {
   const [locationRef, setLocationRef] = useState("")
   const [minPrice, setMinPrice] = useState<number | null>(null)
   const [maxPrice, setMaxPrice] = useState<number | null>(null)
+  const [page, setPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
 
   const navigate = useNavigate()
 

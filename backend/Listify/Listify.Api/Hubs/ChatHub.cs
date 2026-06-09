@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using FluentValidation;
+using Listify.Api.DTOs.Chat;
 using Listify.Application.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +12,16 @@ namespace Listify.Api.Hubs;
 public class ChatHub : Hub
 {
     private readonly ChatService _chatService;
+    private readonly IValidator<SendMessageRequestDto> _sendMessageValidator;
     private readonly ILogger<ChatHub> _logger;
 
-    public ChatHub(ChatService chatService, ILogger<ChatHub> logger)
+    public ChatHub(
+        ChatService chatService,
+        IValidator<SendMessageRequestDto> sendMessageValidator,
+        ILogger<ChatHub> logger)
     {
         _chatService = chatService;
+        _sendMessageValidator = sendMessageValidator;
         _logger = logger;
     }
     
@@ -52,6 +59,18 @@ public class ChatHub : Hub
     
     public async Task SendMessage(string conversationId, string text)
     {
+        var request = new SendMessageRequestDto
+        {
+            ConversationId = conversationId,
+            Text = text
+        };
+        var validationResult = await _sendMessageValidator.ValidateAsync(request, Context.ConnectionAborted);
+        if (!validationResult.IsValid)
+        {
+            var errorMessage = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
+            throw new HubException(errorMessage);
+        }
+
         var userId = Context.UserIdentifier;
         if (userId == null)
             throw new HubException("Unauthorized");

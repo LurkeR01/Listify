@@ -1,8 +1,9 @@
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using Listify.Application.Common.Options;
 using Listify.Application.DTOs;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Listify.Application.Services;
 
@@ -10,12 +11,14 @@ public class LocationService
 {
     private const string NovaPoshtaClientName = "NovaPoshta";
 
-    private readonly IConfiguration _configuration;
+    private readonly NovaPoshtaOptions _novaPoshtaOptions;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public LocationService(IConfiguration configuration, IHttpClientFactory httpClientFactory)
+    public LocationService(
+        IOptions<NovaPoshtaOptions> novaPoshtaOptions,
+        IHttpClientFactory httpClientFactory)
     {
-        _configuration = configuration;
+        _novaPoshtaOptions = novaPoshtaOptions.Value;
         _httpClientFactory = httpClientFactory;
     }
 
@@ -24,15 +27,11 @@ public class LocationService
         if (string.IsNullOrWhiteSpace(query))
             return [];
 
-        var apiKey = _configuration["NOVAPOSHTA:Api_Key"];
-        if (string.IsNullOrWhiteSpace(apiKey))
-            return [];
-
         var client = _httpClientFactory.CreateClient(NovaPoshtaClientName);
 
         var request = new
         {
-            apiKey,
+            apiKey = _novaPoshtaOptions.ApiKey,
             modelName = "AddressGeneral",
             calledMethod = "searchSettlements",
             methodProperties = new

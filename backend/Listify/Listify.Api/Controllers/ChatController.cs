@@ -50,5 +50,24 @@ namespace Listify.Api.Controllers
             var conversation = await _chatService.GetConversationsForUser(userId, token);
             return Ok(conversation.Select(c => c.ToResponse()));
         }
+
+        [Authorize]
+        [HttpGet("{conversationId}/messages")]
+        public async Task<IActionResult> GetMessages(
+            [FromRoute] Guid conversationId,
+            [FromQuery] int page,
+            [FromQuery] int pageSize,
+            CancellationToken token)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var messages = await _chatService.GetMessagesForConversation(
+                conversationId,
+                userId,
+                page,
+                pageSize,
+                token);
+
+            return Ok(messages.Select(m => m.ToResponse()));
+        }
     }
 }

@@ -17,5 +17,12 @@ public interface IChatRepository
 
     Task<Conversation> GetConversation(Guid listingId, Guid buyerId, Guid sellerId,
         CancellationToken token);
+
+    Task<List<Message>> GetMessagesAsync(
+        Guid conversationId,
+        int page,
+        int pageSize,
+        CancellationToken token);
+
     Task SaveChangesAsync(CancellationToken token);
 }

@@ -48,19 +48,25 @@ public static class ConversationMapping
             },
             Messages = conversation.Messages
                 .OrderBy(m => m.CreatedAt)
-                .Select(m => new MessageDto
+                .Select(m => m.ToResponse())
+                .ToList(),
+        };
+    }
+
+    public static MessageDto ToResponse(this Message message)
+    {
+        return new MessageDto
+        {
+            Id = message.Id,
+            Text = message.Text,
+            Sender = new ShortResponseUserDto
             {
-                Id = m.Id,
-                Text = m.Text,
-                Sender = new ShortResponseUserDto
-                {
-                    Id = m.SenderId,
-                    FirstName = m.Sender?.FirstName ?? string.Empty,
-                    AvatarUrl = m.Sender?.AvatarUrl,
-                    AvatarPublicId = m.Sender?.AvatarPublicId,
-                },
-                CreatedAt = m.CreatedAt,
-            }).ToList(),
+                Id = message.SenderId,
+                FirstName = message.Sender?.FirstName ?? string.Empty,
+                AvatarUrl = message.Sender?.AvatarUrl,
+                AvatarPublicId = message.Sender?.AvatarPublicId,
+            },
+            CreatedAt = message.CreatedAt,
         };
     }
 }

@@ -17,10 +17,14 @@ namespace Listify.Api.Controllers
     public class ListingController : ControllerBase
     {
         private readonly ListingService _listingService;
+        private readonly ListingQueryService _listingQueryService;
 
-        public ListingController(ListingService listingService)
+        public ListingController(
+            ListingService listingService,
+            ListingQueryService listingQueryService)
         {
             _listingService = listingService;
+            _listingQueryService = listingQueryService;
         }
         
         [Authorize]
@@ -88,7 +92,7 @@ namespace Listify.Api.Controllers
         [HttpPost("search")]
         public async Task<IActionResult> Get([FromBody] GetListingsQuery request, CancellationToken cancellationToken)
         {
-            var response = await _listingService.HandleQuery(request, cancellationToken);
+            var response = await _listingQueryService.HandleQuery(request, cancellationToken);
             return Ok(response);
         }
 

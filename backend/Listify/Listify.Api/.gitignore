@@ -1,2 +1,2 @@
 ﻿.env
-**/Migrations/
+backend/Listify/Listify.Infrastructure/Migrations/

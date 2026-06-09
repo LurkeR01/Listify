@@ -25,7 +25,9 @@ public class ChatRepository : IChatRepository
                 .ThenInclude(l => l.ListingImages)
             .Include(c => c.Buyer)
             .Include(c => c.Seller)
-            .Include(c => c.Messages)
+            .Include(c => c.Messages
+                .OrderByDescending(m => m.CreatedAt)
+                .Take(1))
                 .ThenInclude(m => m.Sender)
             .FirstOrDefaultAsync(c => c.ListingId == listingId
                 && c.BuyerId == buyerId
@@ -39,21 +41,26 @@ public class ChatRepository : IChatRepository
                 .ThenInclude(l => l.ListingImages)
             .Include(c => c.Buyer)
             .Include(c => c.Seller)
-            .Include(c => c.Messages)
-                .ThenInclude(m => m.Sender)
             .FirstOrDefaultAsync(c => c.Id == conversationId, token);
     }
 
     public async Task<List<Conversation>> GetForUserAsync(Guid userId, CancellationToken token)
     {
         return await _dbContext.Conversations
+            .AsNoTracking()
             .Include(c => c.Listing)
                 .ThenInclude(l => l.ListingImages)
             .Include(c => c.Buyer)
             .Include(c => c.Seller)
-            .Include(c => c.Messages)
+            .Include(c => c.Messages
+                .OrderByDescending(m => m.CreatedAt)
+                .Take(1))
                 .ThenInclude(m => m.Sender)
             .Where(c => c.BuyerId == userId || c.SellerId == userId)
+            .OrderByDescending(c => c.Messages
+                .Select(m => (DateTime?)m.CreatedAt)
+                .Max() ?? c.CreatedAt)
+            .AsSplitQuery()
             .ToListAsync(token);
     }
 
@@ -72,10 +79,32 @@ public class ChatRepository : IChatRepository
                 .ThenInclude(l => l.ListingImages)
             .Include(c => c.Buyer)
             .Include(c => c.Seller)
-            .Include(c => c.Messages)
+            .Include(c => c.Messages
+                .OrderByDescending(m => m.CreatedAt)
+                .Take(1))
                 .ThenInclude(m => m.Sender)
             .FirstOrDefaultAsync(c =>
-                c.ListingId == listingId && c.BuyerId == buyerId && c.SellerId == sellerId);
+                c.ListingId == listingId && c.BuyerId == buyerId && c.SellerId == sellerId, token);
+
+    public async Task<List<Message>> GetMessagesAsync(
+        Guid conversationId,
+        int page,
+        int pageSize,
+        CancellationToken token)
+    {
+        var messages = await _dbContext.Messages
+            .AsNoTracking()
+            .Include(m => m.Sender)
+            .Where(m => m.ConversationId == conversationId)
+            .OrderByDescending(m => m.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(token);
+
+        return messages
+            .OrderBy(m => m.CreatedAt)
+            .ToList();
+    }
 
     public async Task SaveChangesAsync(CancellationToken token) => await _dbContext.SaveChangesAsync(token);
 }

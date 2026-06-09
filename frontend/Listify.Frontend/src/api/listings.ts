@@ -18,6 +18,8 @@ type ListingsSearchParams = {
   minPrice?: number
   maxPrice?: number
   attributeFilters?: RequestCategoryAttributeValueDto[]
+  page?: number
+  pageSize?: number
 }
 
 type ResponseListingPreviewDto = {
@@ -34,6 +36,13 @@ type ResponseListingPreviewDto = {
   location: CityDto
   status?: ListingStatusType | number | string | null
   imageUrl: string | null
+}
+
+type PagedResult<T> = {
+  items: T[]
+  page: number
+  pageSize: number
+  totalCount: number
 }
 
 type ResponseUserApiDto = {
@@ -196,26 +205,37 @@ const toListingStatus = (value: unknown): ListingStatusType | undefined => {
   return undefined
 }
 
+const toListingPreview = (item: ResponseListingPreviewDto): ListingDto => {
+  return {
+    id: String(item.id ?? ""),
+    title: String(item.title ?? ""),
+    publishedAt: pickPublishedAt(item),
+    price: Number(item.price ?? 0),
+    location: toCity(item.location),
+    imageUrl: item.imageUrl ?? undefined,
+  } satisfies ListingDto
+}
+
 export const getListings = async (params: ListingsSearchParams) => {
-  const response = await api.post<ResponseListingPreviewDto[]>("/listing/search", {
+  const response = await api.post<PagedResult<ResponseListingPreviewDto>>("/listing/search", {
     CategoryId: params.categoryId ?? null,
     SearchText: params.searchText,
     LocationRef: params.locationRef,
     MinPrice: params.minPrice,
     MaxPrice: params.maxPrice,
     attributeFilters: params.attributeFilters,
+    Pagination: {
+      Page: params.page ?? 1,
+      PageSize: params.pageSize ?? 20,
+    },
   })
 
-  return response.data.map((item) => {
-    return {
-      id: String(item.id ?? ""),
-      title: String(item.title ?? ""),
-      publishedAt: pickPublishedAt(item),
-      price: Number(item.price ?? 0),
-      location: toCity(item.location),
-      imageUrl: item.imageUrl ?? undefined,
-    } satisfies ListingDto
-  })
+  return {
+    items: response.data.items.map(toListingPreview),
+    page: Number(response.data.page ?? 1),
+    pageSize: Number(response.data.pageSize ?? params.pageSize ?? 20),
+    totalCount: Number(response.data.totalCount ?? 0),
+  }
 }
 
 export const getMyListings = async () => {
