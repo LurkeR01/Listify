@@ -6,6 +6,5 @@ public record GetListingsQuery(
     decimal? MinPrice,
     decimal? MaxPrice,
     string? LocationRef,
-    List<AttributeFilterDto>? AttributeFilters,
-    PaginationParams? Pagination
+    List<AttributeFilterDto>? AttributeFilters
     );

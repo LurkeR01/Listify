@@ -18,8 +18,6 @@ type ListingsSearchParams = {
   minPrice?: number
   maxPrice?: number
   attributeFilters?: RequestCategoryAttributeValueDto[]
-  page?: number
-  pageSize?: number
 }
 
 type ResponseListingPreviewDto = {
@@ -36,13 +34,6 @@ type ResponseListingPreviewDto = {
   location: CityDto
   status?: ListingStatusType | number | string | null
   imageUrl: string | null
-}
-
-type PagedResult<T> = {
-  items: T[]
-  page: number
-  pageSize: number
-  totalCount: number
 }
 
 type ResponseUserApiDto = {
@@ -216,26 +207,17 @@ const toListingPreview = (item: ResponseListingPreviewDto): ListingDto => {
   } satisfies ListingDto
 }
 
-export const getListings = async (params: ListingsSearchParams) => {
-  const response = await api.post<PagedResult<ResponseListingPreviewDto>>("/listing/search", {
+export const getListings = async (params: ListingsSearchParams): Promise<ListingDto[]> => {
+  const response = await api.post<ResponseListingPreviewDto[]>("/listing/search", {
     CategoryId: params.categoryId ?? null,
     SearchText: params.searchText,
     LocationRef: params.locationRef,
     MinPrice: params.minPrice,
     MaxPrice: params.maxPrice,
     attributeFilters: params.attributeFilters,
-    Pagination: {
-      Page: params.page ?? 1,
-      PageSize: params.pageSize ?? 20,
-    },
   })
 
-  return {
-    items: response.data.items.map(toListingPreview),
-    page: Number(response.data.page ?? 1),
-    pageSize: Number(response.data.pageSize ?? params.pageSize ?? 20),
-    totalCount: Number(response.data.totalCount ?? 0),
-  }
+  return response.data.map(toListingPreview)
 }
 
 export const getMyListings = async () => {

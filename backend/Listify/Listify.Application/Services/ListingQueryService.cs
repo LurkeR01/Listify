@@ -19,7 +19,7 @@ public class ListingQueryService
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<PagedResult<ResponseListingPreviewDto>> HandleQuery(
+    public async Task<List<ResponseListingPreviewDto>> HandleQuery(
         GetListingsQuery request,
         CancellationToken token)
     {
@@ -61,15 +61,8 @@ public class ListingQueryService
 
         query = query.Where(l => l.Status == ListingStatus.Published);
 
-        var pagination = request.Pagination ?? new PaginationParams();
-        var page = Math.Max(pagination.Page, 1);
-        var pageSize = Math.Clamp(pagination.PageSize, 1, 100);
-        var totalCount = await query.CountAsync(token);
-
-        var items = await query
+        return await query
             .OrderByDescending(l => l.CreatedOn)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
             .Select(l => new ResponseListingPreviewDto
             {
                 Id = l.Id,
@@ -87,13 +80,5 @@ public class ListingQueryService
                     .FirstOrDefault()
             })
             .ToListAsync(token);
-
-        return new PagedResult<ResponseListingPreviewDto>
-        {
-            Items = items,
-            Page = page,
-            PageSize = pageSize,
-            TotalCount = totalCount
-        };
     }
 }

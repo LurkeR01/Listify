@@ -85,8 +85,11 @@ public class AuthService
     }
 
 
-    public async Task LogoutAsync(string refresh)
+    public async Task LogoutAsync(string? refresh)
     {
+        if (string.IsNullOrWhiteSpace(refresh))
+            throw new InvalidRefreshTokenException("Refresh token is missing");
+
         var refreshTokenHash = ComputeHash(refresh);
         var refreshToken = await _refreshTokensRepository.GetByHashAsync(refreshTokenHash);
 
@@ -98,9 +101,13 @@ public class AuthService
     }
 
 
-    public async Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(string refresh)
+    public async Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(string? refresh)
     {
+        if (string.IsNullOrWhiteSpace(refresh))
+            throw new InvalidRefreshTokenException("Refresh token is missing");
+
         var refreshTokenHash = ComputeHash(refresh);
+
         var refreshToken = await _refreshTokensRepository.GetByHashAsync(refreshTokenHash);
         if (refreshToken == null)
             throw new NotFoundException("Refresh token not found");

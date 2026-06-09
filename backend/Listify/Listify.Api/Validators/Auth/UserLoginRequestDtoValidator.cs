@@ -14,6 +14,6 @@ public class UserLoginRequestDtoValidator : AbstractValidator<UserLoginRequestDt
 
         RuleFor(x => x.Password)
             .NotEmpty()
-            .Length(8, 100);
+            .Length(6, 100);
     }
 }
